@@ -23,9 +23,13 @@ const companySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    companyVerified: {
-        type: Boolean,
-        default: false,
+    contactNumber: {
+        type: String,
+    },
+    verificationStatus: {
+        type: String,
+        enum: ['unsubmitted', 'pending', 'verified', 'rejected'],
+        default: 'unsubmitted'
     },
     verificationDeadline: {
         type: Date,
@@ -34,12 +38,14 @@ const companySchema = new mongoose.Schema({
 });
 
 // Implement MongoDB TTL index 
-// The index only applies if companyVerified is false, automatically purging unverified accounts after deadline.
+// The index only applies if verificationStatus is unsubmitted or pending
 companySchema.index(
     { verificationDeadline: 1 },
     {
         expireAfterSeconds: 0,
-        partialFilterExpression: { companyVerified: false }
+        partialFilterExpression: {
+            verificationStatus: { $in: ['unsubmitted', 'pending'] }
+        }
     }
 );
 
