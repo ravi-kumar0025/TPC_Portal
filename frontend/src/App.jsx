@@ -18,6 +18,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import StudentVerificationForm from './components/StudentVerificationForm';
 import StudentVerificationQueue from './components/StudentVerificationQueue';
 import CompanyVerificationForm from './components/CompanyVerificationForm';
+import StudentAnnouncements from './components/StudentAnnouncements';
 import EditProfile from './pages/EditProfile';
 import MyResumes from './pages/MyResumes';
 
@@ -38,7 +39,7 @@ function App() {
           }>
             <Route path="student" element={<StudentDashboard />} />
             <Route path="student/verify" element={<StudentVerificationForm />} />
-            <Route path="student/announcements" element={<Placeholder title="Announcements" />} />
+            <Route path="student/announcements" element={<StudentAnnouncements />} />
             <Route path="student/calendar" element={<Placeholder title="Calendar & Events" />} />
             <Route path="student/resumes" element={<MyResumes />} />
             <Route path="student/profile" element={<EditProfile />} />
