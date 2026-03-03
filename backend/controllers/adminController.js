@@ -85,21 +85,24 @@ exports.assignAdminPower = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
     try {
-        // Both super_admin, announcement_admin, student_admin can create events theoretically based on requirements
-        const { title, description, date, type, targetBranches, deadline } = req.body;
+        const { title, description, date, startDate, endDate, type, targetBranches, deadline, links } = req.body;
 
         const newEvent = await Event.create({
             title,
             description,
-            date,
+            date: date || startDate,
+            startDate: startDate || date,
+            endDate: endDate || deadline || startDate || date,
             type,
             targetBranches,
             deadline,
+            links: links || [],
             createdBy: req.user.userId
         });
 
         res.status(201).json({ message: 'Event created', event: newEvent });
     } catch (err) {
+        console.error('createEvent Error:', err);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
