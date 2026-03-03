@@ -43,7 +43,7 @@ exports.signup = async (req, res) => {
                 return res.status(400).json({ message: 'Missing required company fields' });
             }
             const existingCompany = await Company.findOne({ companyEmail });
-            if (existingCompany && existingCompany.isVerified) {
+            if (existingCompany && existingCompany.verificationStatus === 'verified') {
                 return res.status(400).json({ message: 'Company email already registered and verified' });
             }
         } else if (role === 'admin') {
@@ -88,7 +88,7 @@ exports.signup = async (req, res) => {
                 companyWebsite: rest.companyWebsite,
                 HRContactName: rest.HRContactName,
                 HRContactEmail: rest.HRContactEmail,
-                companyVerified: false,
+                verificationStatus: 'unsubmitted',
             });
         } else if (role === 'admin') {
             user = await Admin.create({
@@ -194,7 +194,8 @@ exports.verifyOtp = async (req, res) => {
             role: user.role,
         };
         if (user.role === 'admin') payload.adminType = user.adminType;
-        if (user.role === 'company') payload.companyVerified = user.companyVerified;
+        if (user.role === 'company') payload.verificationStatus = user.verificationStatus;
+        if (user.role === 'student') payload.verificationStatus = user.verificationStatus;
 
         const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_super_secret_jwt_key', {
             expiresIn: '7d',
@@ -212,6 +213,19 @@ exports.verifyOtp = async (req, res) => {
         });
     } catch (err) {
         console.error('Verify OTP Error:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('-otp -otpExpiry');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ user });
+    } catch (err) {
+        console.error('Get Current User Error:', err);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
