@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
@@ -76,6 +76,21 @@ const StudentCalendar = () => {
     const [error, setError] = useState(null);
     const [applyingId, setApplyingId] = useState(null);
     const [applySuccess, setApplySuccess] = useState({});
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    // ±2 months navigation bounds
+    const { minDate, maxDate } = useMemo(() => {
+        const now = new Date();
+        const min = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        const max = new Date(now.getFullYear(), now.getMonth() + 3, 0); // last day of +2 month
+        return { minDate: min, maxDate: max };
+    }, []);
+
+    const handleNavigate = (newDate) => {
+        if (newDate >= minDate && newDate <= maxDate) {
+            setCurrentDate(newDate);
+        }
+    };
 
     const fetchCalendar = useCallback(async () => {
         try {
@@ -242,7 +257,8 @@ const StudentCalendar = () => {
                         startAccessor="start"
                         endAccessor="end"
                         style={{ height: '100%' }}
-                        defaultDate={new Date()}
+                        date={currentDate}
+                        onNavigate={handleNavigate}
                         onSelectEvent={handleSelectEvent}
                         eventPropGetter={eventPropGetter}
                         views={['month', 'week', 'agenda']}
