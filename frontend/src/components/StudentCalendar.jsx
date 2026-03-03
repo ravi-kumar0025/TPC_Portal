@@ -261,7 +261,7 @@ const StudentCalendar = () => {
                         onNavigate={handleNavigate}
                         onSelectEvent={handleSelectEvent}
                         eventPropGetter={eventPropGetter}
-                        views={['month', 'week', 'agenda']}
+                        views={['month']}
                         popup={true}
                     />
                 </motion.div>
