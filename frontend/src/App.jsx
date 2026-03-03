@@ -17,6 +17,7 @@ import UserManagement from './components/UserManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 import StudentVerificationForm from './components/StudentVerificationForm';
 import StudentVerificationQueue from './components/StudentVerificationQueue';
+import DevelopersPage from './pages/DevelopersPage';
 import CompanyVerificationForm from './components/CompanyVerificationForm';
 import EditProfile from './pages/EditProfile';
 import MyResumes from './pages/MyResumes';
@@ -27,6 +28,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/developers" element={<DevelopersPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/developers" element={<DevelopersPage />} />

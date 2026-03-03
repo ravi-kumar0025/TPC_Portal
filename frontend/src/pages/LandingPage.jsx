@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { BookOpen, MapPin, Mail, Phone, ExternalLink } from 'lucide-react';
+import HomePageCharts from '../components/HomePageCharts';
+import logo from '../assets/logo.png';
 import DevelopersRibbon from '../components/DevelopersRibbon';
 import HomePageCharts from '../components/HomePageCharts';
 
@@ -19,8 +20,8 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-20 items-center">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                IITP
+                            <div className="w-14 h-14 bg-white rounded-xl p-1.5 flex items-center justify-center shadow-sm ring-1 ring-blue-100">
+                                <img src={logo} alt="IIT Patna logo" className="w-full h-full object-contain" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xl font-bold text-gray-900 tracking-tight">Training & Placement</span>
@@ -29,6 +30,7 @@ export default function LandingPage() {
                         </div>
                         <div className="hidden md:flex items-center space-x-8">
                             <a href="#" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Home</a>
+                            <Link to="/developers" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Developers</Link>
                             <a href="#stats" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Statistics</a>
                             <a href="#contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Contact</a>
                             <Link to="/developers" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Developers</Link>
@@ -42,40 +44,35 @@ export default function LandingPage() {
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <div className="relative pt-20 pb-32 flex content-center items-center justify-center min-h-[90vh]">
-                <div className="absolute top-0 w-full h-full bg-slate-900 overflow-hidden">
-                    <img
-                        src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
-                        alt="IIT Patna Campus"
-                        className="w-full h-full object-cover opacity-30 object-center scale-105 animate-[pulse_20s_ease-in-out_infinite]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-slate-900"></div>
+            {/* Hero Section - Light Mode Editorial */}
+            <div className="relative pt-32 pb-32 flex content-center items-center justify-center min-h-[85vh] bg-[#F9FAFB]">
+                <div className="absolute top-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-100 rounded-full blur-[100px] opacity-60"></div>
+                    <div className="absolute top-40 -left-20 w-72 h-72 bg-emerald-100 rounded-full blur-[80px] opacity-50"></div>
                 </div>
 
-                <div className="container relative mx-auto px-4 mt-16 animate-[fade-in-up_1s_ease-out]">
+                <div className="container relative mx-auto px-4 animate-[fade-in-up_1s_ease-out] z-10">
                     <div className="items-center flex flex-wrap">
                         <div className="w-full lg:w-8/12 mx-auto text-center">
-                            <div className="inline-block px-4 py-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 backdrop-blur-sm text-blue-300 font-medium text-sm mb-6 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                                Excellence in Engineering & Technology
+                            <div className="inline-block px-4 py-1.5 rounded-full border border-gray-200 bg-white shadow-sm text-gray-500 font-bold tracking-widest uppercase text-xs mb-8">
+                                Excellence in Engineering
                             </div>
-                            <h1 className="text-white font-extrabold text-5xl md:text-7xl leading-tight mb-6 tracking-tight drop-shadow-lg">
+                            <h1 className="text-gray-900 font-black text-5xl md:text-7xl leading-[1.1] mb-6 tracking-tight">
                                 Where Ambition <br className="hidden md:block" />
-                                <span className="text-blue-400 relative inline-block">
+                                <span className="text-blue-600 relative inline-block">
                                     Meets Opportunity
-                                    <span className="absolute bottom-1 left-0 w-full h-3 bg-blue-600/30 -z-10 rounded-full blur-sm"></span>
                                 </span>
                             </h1>
-                            <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
-                                Empowering the brightest minds at Indian Institute of Technology Patna
+                            <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light">
+                                Empowering the brightest minds at the Indian Institute of Technology Patna
                                 to connect with global industry leaders and shape the future of technology.
                             </p>
-                            <div className="mt-10 flex gap-4 justify-center">
-                                <Link to="/login" className="bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-400 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all duration-300 flex items-center gap-2 group">
+                            <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+                                <Link to="/login" className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
                                     Recruit at IITP
                                     <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                 </Link>
-                                <Link to="/login" className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 hover:border-white/40 transition-all duration-300">
+                                <Link to="/login" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-300 text-center">
                                     Student Login
                                 </Link>
                             </div>
@@ -84,10 +81,35 @@ export default function LandingPage() {
                 </div>
             </div>
 
+            {/* MESSAGE FROM THE TPC SECTION */}
+            <section className="w-screen bg-blue-50/50 py-32 border-y border-blue-100/50 relative left-1/2 right-1/2 -mx-[50vw]">
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <h3 className="text-blue-900 font-bold tracking-widest uppercase text-sm mb-8">
+                        Words from the Training & Placement Cell
+                    </h3>
+                    <div className="font-serif text-xl md:text-2xl text-gray-800 leading-relaxed space-y-8 text-justify md:text-center italic">
+                        <p>
+                            "The Indian Institute of Technology Patna stands as a beacon of academic rigor and technical prowess. Our curriculum is meticulously designed not just to impart knowledge, but to forge analytical thinkers capable of solving the complex challenges of tomorrow."
+                        </p>
+                        <p>
+                            "We take immense pride in our students, who consistently demonstrate exceptional aptitude and a relentless drive for innovation. The strong, enduring relationships we maintain with global industry leaders are a testament to the unparalleled quality of talent nurtured within these walls."
+                        </p>
+                        <p className="text-lg text-gray-600 mt-6 font-sans not-italic font-medium">
+                            — Professor In-Charge, Training & Placement Cell
+                        </p>
+                    </div>
+                </div>
+            </section>
             {/* Statistics Section */}
             <HomePageCharts />
 
             <DevelopersRibbon />
+
+            {/* Statistics Section */}
+            <section id="stats" className="w-full bg-white relative">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                <HomePageCharts />
+            </section>
 
             {/* Footer */}
             <footer id="contact" className="bg-slate-900 pt-16 pb-8 text-white relative">
@@ -95,8 +117,8 @@ export default function LandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div>
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-900 font-bold text-lg">
-                                    IITP
+                                <div className="w-12 h-12 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm ring-1 ring-white/20">
+                                    <img src={logo} alt="IIT Patna logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-2xl font-bold tracking-tight">TPC IIT Patna</h3>
                             </div>
