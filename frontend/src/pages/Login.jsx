@@ -73,7 +73,7 @@ export default function Login() {
                         <form onSubmit={handleRequestOtp} className="space-y-5">
                             <div>
                                 <label className={labelStyle}>Account Type</label>
-                                <select value={role} onChange={(e) => setRole(e.target.value)} className={inputStyle + " cursor-pointer appearance-none"}>
+                                <select value={role} onChange={(e) => setRole(e.target.value)} className={inputStyle + " cursor-pointer"}>
                                     <option value="student">Student</option>
                                     <option value="company">Company</option>
                                     <option value="admin">Admin</option>

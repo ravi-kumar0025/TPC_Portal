@@ -43,3 +43,6 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+notes.txt
+project_summary.md.resolved
