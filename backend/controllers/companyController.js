@@ -1,4 +1,5 @@
 const Student = require('../models/Student');
+const Company = require('../models/Company');
 
 exports.getStudents = async (req, res) => {
     try {
@@ -32,5 +33,42 @@ exports.getStudents = async (req, res) => {
     } catch (err) {
         console.error('getStudents Error:', err);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.submitVerification = async (req, res) => {
+    try {
+        const companyId = req.user.userId;
+        const { companyName, companyEmail, companyWebsite, HRContactName, HRContactEmail, contactNumber } = req.body;
+
+        const updateData = {
+            verificationStatus: 'pending'
+        };
+
+        if (companyName) updateData.companyName = companyName;
+        if (companyEmail) updateData.companyEmail = companyEmail;
+        if (companyWebsite) updateData.companyWebsite = companyWebsite;
+        if (HRContactName) updateData.HRContactName = HRContactName;
+        if (HRContactEmail) updateData.HRContactEmail = HRContactEmail;
+        if (contactNumber) updateData.contactNumber = contactNumber;
+
+        const updatedCompany = await Company.findByIdAndUpdate(
+            companyId,
+            updateData,
+            { new: true }
+        );
+
+        if (!updatedCompany) {
+            return res.status(404).json({ message: 'Company not found.' });
+        }
+
+        res.status(200).json({
+            message: 'Company verification submitted successfully.',
+            company: updatedCompany
+        });
+
+    } catch (err) {
+        console.error('submitVerification Error:', err);
+        res.status(500).json({ message: 'Internal server error during company verification submission.' });
     }
 };
