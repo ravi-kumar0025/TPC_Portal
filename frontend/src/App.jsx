@@ -12,16 +12,21 @@ import AdminDashboard from './components/AdminDashboard';
 import ManageAnnouncements from './components/ManageAnnouncements';
 import CompanyVerificationQueue from './components/CompanyVerificationQueue';
 import StudentCalendarUpdate from './components/StudentCalendarUpdate';
+import StudentCalendar from './components/StudentCalendar';
 import AdminPowerAssignment from './components/AdminPowerAssignment';
 import UserManagement from './components/UserManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 import StudentVerificationForm from './components/StudentVerificationForm';
 import StudentVerificationQueue from './components/StudentVerificationQueue';
 import CompanyVerificationForm from './components/CompanyVerificationForm';
+import StudentAnnouncements from './components/StudentAnnouncements';
 import EditProfile from './pages/EditProfile';
 import MyResumes from './pages/MyResumes';
+import useCursorGlow from './hooks/useCursorGlow';
 
 function App() {
+  useCursorGlow();
+
   return (
     <AuthProvider>
       <Router>
@@ -38,8 +43,8 @@ function App() {
           }>
             <Route path="student" element={<StudentDashboard />} />
             <Route path="student/verify" element={<StudentVerificationForm />} />
-            <Route path="student/announcements" element={<Placeholder title="Announcements" />} />
-            <Route path="student/calendar" element={<Placeholder title="Calendar & Events" />} />
+            <Route path="student/announcements" element={<StudentAnnouncements />} />
+            <Route path="student/calendar" element={<StudentCalendar />} />
             <Route path="student/resumes" element={<MyResumes />} />
             <Route path="student/profile" element={<EditProfile />} />
             <Route path="student/*" element={<Navigate to="/dashboard/student" replace />} />

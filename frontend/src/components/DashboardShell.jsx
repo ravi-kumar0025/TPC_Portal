@@ -3,6 +3,7 @@ import { Outlet, Navigate, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserCircle, LogOut, Bell, Building, CheckCircle, Database, Calendar as CalendarIcon, FileText, Settings, ShieldAlert, LayoutDashboard, House } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import logo from '../assets/logo.png';
 
 export default function DashboardShell() {
     const { user, logout } = useAuth();
@@ -46,8 +47,8 @@ export default function DashboardShell() {
             {/* Top Navbar */}
             <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm shadow-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:shadow-slate-950/30">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm shadow-md">
-                        TPC
+                    <div className="w-9 h-9 bg-white rounded-md p-1 flex items-center justify-center shadow-sm ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-700">
+                        <img src={logo} alt="IIT Patna logo" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-bold text-slate-800 hidden sm:block dark:text-slate-100">IIT Patna Portal</span>
                 </div>

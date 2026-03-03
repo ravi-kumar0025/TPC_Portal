@@ -124,6 +124,17 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
     const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
     const tooltipText = isDark ? '#e2e8f0' : '#0f172a';
     const cursorFill = isDark ? '#1e293b' : '#f8fafc';
+    const lineColor = isDark ? '#cbd5e1' : COLORS.Line;
+    const legendTextColor = isDark ? '#e2e8f0' : '#334155';
+    const tooltipContentStyle = {
+        backgroundColor: tooltipBg,
+        border: `1px solid ${tooltipBorder}`,
+        borderRadius: '8px',
+        color: tooltipText,
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+    };
+    const tooltipItemStyle = { color: tooltipText };
+    const tooltipLabelStyle = { color: tooltipText, fontWeight: 600 };
 
     // 1. Process Bar Data
     const barData = data.academicYears.map((yearObj, i, arr) => {
@@ -209,7 +220,7 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
                                         <Bar yAxisId="left" dataKey="B.Tech_avg" name="B.Tech" fill={COLORS.BTech} radius={[4, 4, 0, 0]} barSize={28} />
                                         <Bar yAxisId="left" dataKey="M.Tech_avg" name="M.Tech" fill={COLORS.MTech} radius={[4, 4, 0, 0]} barSize={28} />
                                         <Bar yAxisId="left" dataKey="M.Sc_avg" name="M.Sc" fill={COLORS.MSc} radius={[4, 4, 0, 0]} barSize={28} />
-                                        <Line yAxisId="right" type="monotone" dataKey="yoyGrowth" stroke={COLORS.Line} strokeWidth={3} dot={{ r: 5, fill: '#fff', stroke: COLORS.Line, strokeWidth: 2 }} activeDot={{ r: 7, fill: COLORS.Line }} />
+                                        <Line yAxisId="right" type="monotone" dataKey="yoyGrowth" stroke={lineColor} strokeWidth={3} dot={{ r: 5, fill: '#fff', stroke: lineColor, strokeWidth: 2 }} activeDot={{ r: 7, fill: lineColor }} />
                                     </ComposedChart>
                                 </ResponsiveContainer>
                             </div>
@@ -244,9 +255,17 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
                                         />
                                         <Tooltip
                                             formatter={(value, name) => [`${value}% Placed`, name]}
-                                            contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: '8px', color: tooltipText, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                                            contentStyle={tooltipContentStyle}
+                                            itemStyle={tooltipItemStyle}
+                                            labelStyle={tooltipLabelStyle}
                                         />
-                                        <Legend iconSize={10} layout="horizontal" verticalAlign="bottom" wrapperStyle={{ fontSize: '13px', color: axisColor, paddingTop: '15px' }} />
+                                        <Legend
+                                            iconSize={10}
+                                            layout="horizontal"
+                                            verticalAlign="bottom"
+                                            wrapperStyle={{ fontSize: '13px', color: legendTextColor, paddingTop: '15px' }}
+                                            formatter={(value) => <span style={{ color: legendTextColor }}>{value}</span>}
+                                        />
                                     </RadialBarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -291,7 +310,9 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
                                     <PieChart>
                                         <Tooltip
                                             formatter={(value) => [`${value} Companies`, 'Recruiters']}
-                                            contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: '8px', color: tooltipText, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                                            contentStyle={tooltipContentStyle}
+                                            itemStyle={tooltipItemStyle}
+                                            labelStyle={tooltipLabelStyle}
                                         />
                                         <Pie
                                             data={data.sectors}

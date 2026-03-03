@@ -5,6 +5,7 @@ import Tilt from 'react-parallax-tilt';
 import { Github, Linkedin } from 'lucide-react';
 import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
+import logo from '../assets/logo.png';
 
 // Framer Motion Variants for Staggered Entrance
 const containerVariants = {
@@ -46,7 +47,7 @@ const DeveloperCard = ({ member, index }) => {
     const organicOffset = getOffset(index);
 
     return (
-        <MotionDiv variants={itemVariants} className={`h-full w-full ${organicOffset}`}>
+        <MotionDiv variants={itemVariants} className={`w-full ${organicOffset}`}>
             <Tilt
                 tiltMaxAngleX={10}
                 tiltMaxAngleY={10}
@@ -58,11 +59,11 @@ const DeveloperCard = ({ member, index }) => {
                 glareMaxOpacity={0.15}
                 glareColor="#ffffff"
                 glarePosition="bottom"
-                className="h-full rounded-[2rem]"
+                className="w-full rounded-[2rem]"
             >
-                <div className="moving-border-card relative h-full rounded-[2rem] p-[2px] overflow-hidden group shadow-[0_0_36px_-16px_rgba(14,165,233,0.45)] dark:shadow-[0_0_44px_-16px_rgba(34,211,238,0.6)]">
+                <div className="moving-border-card relative w-full min-h-[360px] rounded-[2rem] p-[2px] overflow-hidden group shadow-[0_0_36px_-16px_rgba(14,165,233,0.45)] dark:shadow-[0_0_44px_-16px_rgba(34,211,238,0.6)]">
                     <div
-                        className="relative h-full flex flex-col items-center px-5 py-8 rounded-[1.9rem] bg-white/95 border border-blue-100 shadow-[0_20px_54px_-22px_rgba(14,165,233,0.48)] hover:shadow-[0_24px_62px_-20px_rgba(14,165,233,0.56)] transition-all duration-500 overflow-hidden dark:bg-slate-900/95 dark:border-cyan-900/80 dark:shadow-[0_22px_58px_-22px_rgba(34,211,238,0.44)] dark:hover:shadow-[0_28px_66px_-20px_rgba(34,211,238,0.58)]"
+                        className="relative w-full min-h-[356px] flex flex-col items-center px-5 py-8 pb-20 rounded-[1.9rem] bg-white/95 border border-blue-100 shadow-[0_20px_54px_-22px_rgba(14,165,233,0.48)] hover:shadow-[0_24px_62px_-20px_rgba(14,165,233,0.56)] transition-all duration-500 overflow-hidden dark:bg-slate-900/95 dark:border-cyan-900/80 dark:shadow-[0_22px_58px_-22px_rgba(34,211,238,0.44)] dark:hover:shadow-[0_28px_66px_-20px_rgba(34,211,238,0.58)]"
                     >
                         {/* Profile Image */}
                         <div className="relative w-28 h-28 mb-5 z-10">
@@ -142,19 +143,19 @@ export default function DevelopersPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-20 items-center">
                         <Link to="/" className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                IITP
+                            <div className="w-14 h-14 bg-white rounded-xl p-1.5 flex items-center justify-center shadow-sm ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-700">
+                                <img src={logo} alt="IIT Patna logo" className="w-full h-full object-contain" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-xl font-bold text-gray-900 tracking-tight dark:text-slate-100">Training & Placement</span>
+                                <span className="text-xl font-bold text-gray-900 tracking-tight dark:text-slate-100">Training &amp; Placement</span>
                                 <span className="text-sm font-medium text-blue-600">IIT Patna</span>
                             </div>
                         </Link>
                         <div className="hidden md:flex items-center space-x-8">
                             <Link to="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Home</Link>
+                            <Link to="/developers" className="text-blue-600 font-medium transition-colors">Developers</Link>
                             <Link to="/#stats" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Statistics</Link>
                             <Link to="/#contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Contact</Link>
-                            <Link to="/developers" className="text-blue-600 font-medium transition-colors">Developers</Link>
                             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
                             <ThemeToggle />
                             <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
@@ -195,7 +196,7 @@ export default function DevelopersPage() {
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, margin: "-100px" }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16 lg:gap-y-12"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16 lg:gap-y-20"
                 >
                     {developers.map((member, index) => (
                         <DeveloperCard key={member._id || member.name} member={member} index={index} />

@@ -6,23 +6,23 @@ const TEAM_MEMBERS = [
         image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
     },
     {
-        name: "Parth", role: "Frontend Architect",
+        name: "Parth Kataria", role: "Frontend Architect",
         image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop"
     },
     {
-        name: "Aarya", role: "Backend Specialist",
+        name: "Aaryaa", role: "Backend Specialist",
         image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop"
     },
     {
-        name: "Shikhar", role: "Chief Vibe Officer",
+        name: "Shikhar Yadav", role: "Chief Vibe Officer",
         image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop"
     },
     {
-        name: "Deva", role: "DevOps Engineer",
+        name: "Devansh Kumar Sharma", role: "DevOps Engineer",
         image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop"
     },
     {
-        name: "Half Girl(Anjney)", role: "Chief Vibe Officer",
+        name: "Anjney Lawaniya", role: "Chief Vibe Officer",
         image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop"
     }
 ];

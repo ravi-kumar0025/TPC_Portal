@@ -27,13 +27,16 @@ export default function StudentDashboard() {
     const { token, user } = useAuth();
     const [events, setEvents] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [viewedIds, setViewedIds] = useState(new Set());
+    const [calView, setCalView] = useState('month');
 
     useEffect(() => {
-        if (token) {
+        if (token && user) {
             fetchEvents();
             fetchAnnouncements();
         }
-    }, [token]);
+    }, [token, user?.department]);
 
     const fetchEvents = async () => {
         try {
@@ -55,10 +58,18 @@ export default function StudentDashboard() {
 
     const fetchAnnouncements = async () => {
         try {
-            const branch = user?.branch || 'CSE';
-            const { data } = await axios.get(`http://localhost:5000/api/student/announcements?branch=${branch}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // Use the student's actual department and program from their profile
+            const department = user?.department?.trim() || '';
+            const program = user?.program?.trim() || '';
+
+            const params = new URLSearchParams();
+            if (department) params.append('branch', department);
+            if (program) params.append('program', program);
+
+            const { data } = await axios.get(
+                `http://localhost:5000/api/student/announcements?${params.toString()}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
             setAnnouncements(data.announcements);
         } catch (err) {
             console.error("Error fetching announcements:", err);
@@ -66,13 +77,59 @@ export default function StudentDashboard() {
     };
 
     const eventStyleGetter = (event) => {
-        let typeClass = 'tpc-calendar-event-default';
-        if (event.type === 'internship') typeClass = 'tpc-calendar-event-internship';
-        if (event.type === 'placement_drive') typeClass = 'tpc-calendar-event-placement';
+        const isViewed = viewedIds.has(event.id || event.title);
+        let color = isViewed ? '#93c5fd' : '#3b82f6';
+        if (event.type === 'internship') color = isViewed ? '#6ee7b7' : '#10b981';
+        if (event.type === 'placement_drive') color = isViewed ? '#c4b5fd' : '#8b5cf6';
+        if (event.type === 'announcement') color = isViewed ? '#fcd34d' : '#f59e0b';
 
+        // In week/day views render as colored pills; in month view dots handle it via CSS
+        if (calView !== 'month') {
+            return {
+                style: {
+                    backgroundColor: color,
+                    borderRadius: '8px',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '0.78rem',
+                    fontWeight: 500,
+                    padding: '2px 8px',
+                    opacity: isViewed ? 0.7 : 1,
+                }
+            };
+        }
+        // Month view: transparent background, CSS dot uses currentColor
         return {
-            className: `tpc-calendar-event ${typeClass}`,
+            style: {
+                color,
+                backgroundColor: 'transparent',
+                border: 'none',
+                boxShadow: 'none',
+                padding: 0,
+                opacity: isViewed ? 0.55 : 1,
+            }
         };
+    };
+
+    const calendarEvents = [
+        ...events,
+        ...announcements.map(a => ({
+            id: a._id,
+            title: a.title,
+            start: new Date(a.createdAt),
+            end: new Date(new Date(a.createdAt).getTime() + 60 * 60 * 1000),
+            type: a.type || 'announcement',
+            description: a.content || a.description
+        }))
+    ];
+
+    const handleSelectEvent = (event) => {
+        setSelectedEvent(event);
+        setViewedIds(prev => new Set([...prev, event.id || event.title]));
+    };
+
+    const closeDetails = () => {
+        setSelectedEvent(null);
     };
 
     return (
@@ -88,65 +145,262 @@ export default function StudentDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Calendar Area */}
-                <div className="lg:col-span-2 bg-white/95 p-6 rounded-2xl shadow-[0_12px_32px_-20px_rgba(15,23,42,0.5)] border border-slate-100 flex flex-col backdrop-blur-sm dark:bg-slate-900/90 dark:border-slate-700/70 dark:shadow-[0_18px_36px_-20px_rgba(2,6,23,0.9)]">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:text-slate-100 dark:border-slate-700/70">
-                        <CalendarIcon className="text-blue-500 dark:text-blue-400" /> Event Calendar
+                <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-[0_12px_32px_-20px_rgba(15,23,42,0.5)] border border-slate-100 flex flex-col backdrop-blur-sm">
+                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
+                        <CalendarIcon className="text-blue-500" /> Event Calendar
                     </h2>
-                    <div className="flex-1 min-h-[500px] calendar-wrapper tpc-calendar-skin">
+                    <div className="flex-1 min-h-[500px] calendar-wrapper calendar-color-lock">
+                        <style>{`
+                            /* --- Base --- */
+                            .rbc-calendar { font-family: 'Inter', sans-serif; }
+                            .calendar-wrapper .rbc-calendar,
+                            .calendar-wrapper .rbc-month-view,
+                            .calendar-wrapper .rbc-time-view,
+                            .calendar-wrapper .rbc-time-header-content,
+                            .calendar-wrapper .rbc-time-content,
+                            .calendar-wrapper .rbc-time-gutter,
+                            .calendar-wrapper .rbc-month-row,
+                            .calendar-wrapper .rbc-row-bg,
+                            .calendar-wrapper .rbc-day-bg {
+                                background: #ffffff !important;
+                            }
+                            .rbc-header { padding: 10px; font-weight: 700; text-transform: uppercase; font-size: 0.72rem; color: #475569; border-bottom: 1px solid #e2e8f0; }
+
+                            /* --- Date cell numbers as circles --- */
+                            .rbc-date-cell { text-align: center; padding: 4px 0; }
+                            .rbc-date-cell button, .rbc-date-cell a {
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                font-size: 0.82rem;
+                                font-weight: 500;
+                                color: #1e293b;
+                                transition: background 0.15s;
+                                text-decoration: none;
+                            }
+                            .rbc-date-cell button:hover, .rbc-date-cell a:hover { background: #e2e8f0; }
+                            .rbc-now .rbc-button-link, .rbc-now button, .rbc-now a {
+                                background: #3b82f6 !important;
+                                color: #fff !important;
+                                font-weight: 700 !important;
+                            }
+                            .rbc-today { background-color: #eff6ff; }
+                            .rbc-off-range-bg { background-color: #e8edf4; }
+                            /* Current month cells — slightly off-white */
+                            .rbc-month-view .rbc-day-bg {
+                                background-color: #ffffff;
+                                border-radius: 12px;
+                            }
+                            /* Today's cell */
+                            .rbc-month-view .rbc-today {
+                                background-color: #eff6ff;
+                                border-radius: 12px;
+                            }
+                            /* Prev / next month cells — noticeably darker */
+                            .rbc-month-view .rbc-off-range-bg {
+                                background-color: #f3f5f8;
+                                border-radius: 12px;
+                            }
+                            .rbc-off-range .rbc-date-cell a,
+                            .rbc-off-range .rbc-button-link,
+                            .rbc-off-range button {
+                                color: #64748b;
+                                opacity: 1;
+                            }
+
+                            /* --- Events as colored dot circles in MONTH VIEW only --- */
+                            .rbc-month-view .rbc-event {
+                                padding: 0 !important;
+                                background: transparent !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                min-height: unset !important;
+                            }
+                            .rbc-month-view .rbc-event-content {
+                                display: flex;
+                                align-items: center;
+                                gap: 5px;
+                                padding: 2px 4px;
+                                font-size: 0.72rem;
+                                font-weight: 600;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                color: #1e293b;
+                            }
+                            /* Colored dot before title — month view only */
+                            .rbc-month-view .rbc-event-content::before {
+                                content: '';
+                                display: inline-block;
+                                min-width: 9px;
+                                height: 9px;
+                                border-radius: 50%;
+                                background: currentColor;
+                                flex-shrink: 0;
+                            }
+                            .rbc-event-label { display: none; }
+                            .rbc-selected { outline: none !important; }
+
+                            /* --- "+N more" link --- */
+                            .rbc-show-more {
+                                font-size: 0.7rem;
+                                color: #1d4ed8;
+                                font-weight: 700;
+                                padding-left: 6px;
+                                background: none;
+                            }
+
+                            .calendar-wrapper .rbc-toolbar .rbc-toolbar-label {
+                                color: #0f172a !important;
+                                font-weight: 700;
+                            }
+                            .calendar-wrapper .rbc-toolbar button {
+                                color: #334155 !important;
+                                background: #ffffff !important;
+                                border-color: #cbd5e1 !important;
+                                font-weight: 600;
+                            }
+                            .calendar-wrapper .rbc-toolbar button:hover,
+                            .calendar-wrapper .rbc-toolbar button:focus-visible {
+                                color: #1e293b !important;
+                                background: #f8fafc !important;
+                            }
+                            .calendar-wrapper .rbc-toolbar button.rbc-active {
+                                background: #f1f5f9 !important;
+                                color: #0f172a !important;
+                            }
+
+                            /* --- Popup overlay stays as rounded rectangle pills --- */
+                            .rbc-overlay {
+                                border-radius: 12px;
+                                box-shadow: 0 8px 30px rgba(0,0,0,0.14);
+                                border: 1px solid #e2e8f0;
+                                padding: 8px;
+                                z-index: 100;
+                                background: #fff;
+                            }
+                            .rbc-overlay-header {
+                                font-size: 0.72rem;
+                                font-weight: 700;
+                                color: #64748b;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                                padding: 4px 6px 8px;
+                                border-bottom: 1px solid #f1f5f9;
+                                margin-bottom: 4px;
+                            }
+                            .rbc-overlay .rbc-event {
+                                border-radius: 6px !important;
+                                padding: 5px 10px !important;
+                                margin-bottom: 4px;
+                                background: #3b82f6 !important;
+                                color: #fff;
+                            }
+                            .rbc-overlay .rbc-event-content {
+                                font-size: 0.78rem;
+                                font-weight: 500;
+                                color: #fff !important;
+                            }
+                            .rbc-overlay .rbc-event-content::before { display: none; }
+
+                            /* --- Grid lines --- */
+                            .rbc-month-row { border-color: #f1f5f9; }
+                            .rbc-day-bg + .rbc-day-bg { border-color: #f1f5f9; }
+                            .rbc-month-view { border-color: #f1f5f9; border-radius: 8px; }
+                        `}</style>
                         <BigCalendar
                             localizer={localizer}
-                            events={events}
+                            events={calendarEvents}
                             startAccessor="start"
                             endAccessor="end"
                             style={{ height: 500 }}
+                            defaultDate={new Date(2026, 2, 3)}
                             eventPropGetter={eventStyleGetter}
                             views={['month', 'week', 'day']}
+                            view={calView}
+                            onView={setCalView}
+                            popup={true}
+                            onSelectEvent={handleSelectEvent}
                         />
                     </div>
                 </div>
 
-                {/* Announcements Sidebar */}
-                <div className="bg-white/95 p-6 rounded-2xl shadow-[0_12px_32px_-20px_rgba(15,23,42,0.5)] border border-slate-100 backdrop-blur-sm dark:bg-slate-900/90 dark:border-slate-700/70 dark:shadow-[0_18px_36px_-20px_rgba(2,6,23,0.9)]">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:text-slate-100 dark:border-slate-700/70">
-                        <Megaphone className="text-amber-500 dark:text-amber-400" /> Recent Announcements
-                    </h2>
-                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                        {announcements.length === 0 ? (
-                            <div className="text-center py-8 text-slate-400 font-medium text-sm dark:text-slate-500">No new announcements for your branch.</div>
-                        ) : (
-                            announcements.map((a) => (
-                                <div key={a._id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-blue-50 hover:border-blue-100 transition-colors group cursor-pointer dark:bg-slate-800/70 dark:border-slate-700/80 dark:hover:bg-slate-800 dark:hover:border-blue-500/40">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-white border shadow-sm group-hover:border-blue-200 dark:bg-slate-900/80 dark:border-slate-600 dark:text-slate-200">
-                                            {a.type?.replace('_', ' ')}
-                                        </span>
-                                        <span className="text-xs text-slate-400 font-medium flex items-center gap-1 dark:text-slate-500"><Clock size={12} />{new Date(a.createdAt).toLocaleDateString()}</span>
-                                    </div>
-                                    <h3 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-700 transition-colors dark:text-slate-100 dark:group-hover:text-blue-300">{a.title}</h3>
-                                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed dark:text-slate-300">{a.description}</p>
-                                </div>
-                            ))
-                        )}
+                {/* Announcements / Details Sidebar */}
+                <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col h-full dark:bg-slate-900/90 dark:border-slate-700/70 dark:shadow-[0_18px_36px_-20px_rgba(2,6,23,0.9)]">
 
-                        {/* Static Demo Card */}
-                        <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-blue-50 hover:border-blue-100 transition-colors group cursor-pointer relative overflow-hidden dark:bg-slate-800/70 dark:border-slate-700/80 dark:hover:bg-slate-800 dark:hover:border-blue-500/40">
-                            <div className="absolute top-0 right-0 w-12 h-12 bg-cyan-100 rounded-bl-full -mr-2 -mt-2 -z-0 dark:bg-cyan-500/20"></div>
-                            <div className="relative z-10">
-                                <div className="flex items-start justify-between mb-2">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-cyan-100 border border-cyan-200 text-cyan-700 shadow-sm dark:bg-cyan-500/20 dark:border-cyan-500/40 dark:text-cyan-300">
-                                        Featured
-                                    </span>
-                                    <span className="text-xs text-slate-400 font-medium flex items-center gap-1 dark:text-slate-500"><Clock size={12} />Today</span>
-                                </div>
-                                <h3 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-700 transition-colors flex items-center gap-2 dark:text-slate-100 dark:group-hover:text-blue-300">
-                                    <Briefcase size={14} className="text-cyan-600 dark:text-cyan-300" /> TPC Prep Sessions
-                                </h3>
-                                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed dark:text-slate-300">
-                                    Join the upcoming Google interview prep sessions organized by GDG IIT Patna.
-                                </p>
+                    {selectedEvent ? (
+                        <>
+                            <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6 dark:border-slate-700">
+                                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 dark:text-slate-100">
+                                    <Briefcase className="text-indigo-500 dark:text-indigo-300" /> Event Details
+                                </h2>
+                                <button
+                                    onClick={closeDetails}
+                                    className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-red-500 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-red-300"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                                </button>
                             </div>
-                        </div>
-                    </div>
+
+                            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                                <div>
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-2 dark:bg-slate-800 dark:text-slate-300">
+                                        {selectedEvent.type ? selectedEvent.type.replace('_', ' ') : 'Event'}
+                                    </span>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2 dark:text-slate-100">{selectedEvent.title}</h3>
+                                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 dark:text-slate-300">
+                                        <Clock size={14} className="text-slate-400 dark:text-slate-500" />
+                                        <span>{new Date(selectedEvent.start).toLocaleString()}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 dark:bg-slate-800/80 dark:border-slate-700">
+                                    <h4 className="font-semibold text-slate-800 text-sm mb-2 dark:text-slate-100">Description</h4>
+                                    <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap dark:text-slate-300">
+                                        {selectedEvent.description || selectedEvent.content || "No detailed description provided."}
+                                    </p>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:text-slate-100 dark:border-slate-700">
+                                <Megaphone className="text-amber-500 dark:text-amber-300" /> Recent Announcements
+                            </h2>
+                            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar flex-1">
+                                {announcements.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-400 font-medium text-sm dark:text-slate-500">No new announcements for your branch.</div>
+                                ) : (
+                                    announcements.map((a) => (
+                                        <div
+                                            key={a._id}
+                                            onClick={() => handleSelectEvent({
+                                                id: a._id,
+                                                title: a.title,
+                                                start: new Date(a.createdAt),
+                                                end: new Date(new Date(a.createdAt).getTime() + 60 * 60 * 1000),
+                                                type: a.type || 'announcement',
+                                                description: a.content || a.description
+                                            })}
+                                            className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-100 transition-colors group cursor-pointer dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800 dark:hover:border-blue-800"
+                                        >
+                                            <div className="flex items-start justify-between mb-2">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-white border shadow-sm group-hover:border-blue-200 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:group-hover:border-blue-700">
+                                                    {a.type ? a.type.replace('_', ' ') : 'Announcement'}
+                                                </span>
+                                                <span className="text-xs text-slate-400 font-medium flex items-center gap-1 dark:text-slate-500"><Clock size={12} />{new Date(a.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <h3 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-700 transition-colors dark:text-slate-100 dark:group-hover:text-blue-300">{a.title}</h3>
+                                            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed dark:text-slate-300">{a.content || a.description}</p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

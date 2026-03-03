@@ -126,7 +126,7 @@ export default function LandingPage() {
                             <ul className="space-y-4 text-slate-400 text-sm">
                                 <li className="flex items-start gap-3">
                                     <MapPin size={18} className="text-blue-400 mt-1 flex-shrink-0" />
-                                    <span>Training and Placement Cell,<br />Admin Block, IIT Patna,<br />Bihta, Bihar - 801103</span>
+                                    <span>Training and Placement Cell,<br />Admin Block, IIT Patna,<br />Bihta, Bihar - 801106</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <Mail size={18} className="text-blue-400" />

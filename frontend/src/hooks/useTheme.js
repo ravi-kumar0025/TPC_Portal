@@ -19,6 +19,7 @@ const getPreferredTheme = () => {
 const applyTheme = (theme) => {
     if (typeof document === 'undefined') return;
     document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.style.colorScheme = theme;
 };
 
