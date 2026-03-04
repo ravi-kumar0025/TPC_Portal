@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FileText, UploadCloud, Loader2, ExternalLink, ShieldAlert, CheckCircle2, ChevronRight } from 'lucide-react';
+import { FileText, UploadCloud, Loader2, ExternalLink, ShieldAlert, CheckCircle2, ChevronRight, Trash2 } from 'lucide-react';
 
 export default function MyResumes() {
     const { user, token } = useAuth();
@@ -81,6 +81,38 @@ export default function MyResumes() {
         }
     };
 
+    const handleRemove = async () => {
+        setUploading(true);
+        setMessage('');
+        setError('');
+
+        try {
+            const formData = new FormData();
+            formData.append('removeResume', 'true');
+
+            const res = await fetch('http://localhost:5000/api/student/profile', {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData,
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage('Resume removed successfully!');
+                setProfile(data.student);
+            } else {
+                setError(data.message || 'Error removing resume.');
+            }
+        } catch (err) {
+            setError('Server connection error during removal.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full min-h-[50vh]">
@@ -147,15 +179,25 @@ export default function MyResumes() {
                                     <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">Uploaded securely via Cloudinary</p>
                                 </div>
                             </div>
-                            <a
-                                href={profile.resumeLink}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-blue-600 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm dark:bg-slate-900 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-blue-300"
-                            >
-                                <ExternalLink size={18} />
-                                View Resume
-                            </a>
+                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+                                <a
+                                    href={profile.resumeLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-blue-600 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm dark:bg-slate-900 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+                                >
+                                    <ExternalLink size={18} />
+                                    View Resume
+                                </a>
+                                <button
+                                    onClick={handleRemove}
+                                    disabled={uploading}
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-900 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/30"
+                                >
+                                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 size={18} />}
+                                    Remove
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-8 px-4 bg-slate-50 border border-slate-100 border-dashed rounded-xl dark:bg-slate-800/70 dark:border-slate-700">
@@ -201,8 +243,8 @@ export default function MyResumes() {
                                 type="submit"
                                 disabled={!isVerified || !resumeFile || uploading}
                                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm ${!isVerified || !resumeFile || uploading
-                                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-400'
+                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-400'
                                     }`}
                             >
                                 {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UploadCloud className="w-5 h-5" />}
