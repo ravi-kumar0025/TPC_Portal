@@ -13,10 +13,12 @@ export default function DashboardShell() {
         return <Navigate to="/login" replace />;
     }
 
-    // Redirect to correct sub-dashboard if user hits /dashboard directly
+    // Prevent access to other roles' dashboards by enforcing namespace prefix
     const pathname = window.location.pathname;
-    if (pathname === '/dashboard' || pathname === '/dashboard/') {
-        return <Navigate to={`/dashboard/${user.role}`} replace />;
+    const allowedPrefix = `/dashboard/${user.role}`;
+
+    if (pathname === '/dashboard' || pathname === '/dashboard/' || !pathname.startsWith(allowedPrefix)) {
+        return <Navigate to={allowedPrefix} replace />;
     }
 
     const handleLogout = () => {

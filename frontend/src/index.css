@@ -61,16 +61,20 @@
 }
 
 @keyframes ribbon-water-wave {
+
   0%,
   100% {
     transform: translate3d(0, 0, 0);
   }
+
   25% {
     transform: translate3d(0, -8px, 0);
   }
+
   50% {
     transform: translate3d(0, 5px, 0);
   }
+
   75% {
     transform: translate3d(0, -4px, 0);
   }
@@ -95,12 +99,10 @@
   }
 
   .dark .cursor-glow-target::after {
-    background: radial-gradient(
-      110px circle at var(--cursor-glow-x, 50%) var(--cursor-glow-y, 50%),
-      rgba(56, 189, 248, 0.34) 0%,
-      rgba(59, 130, 246, 0.18) 36%,
-      rgba(56, 189, 248, 0) 74%
-    );
+    background: radial-gradient(80px circle at var(--cursor-glow-x, 50%) var(--cursor-glow-y, 50%),
+        rgba(56, 189, 248, 0.15) 0%,
+        rgba(59, 130, 246, 0.08) 40%,
+        rgba(56, 189, 248, 0) 70%);
   }
 
   .dark .cursor-glow-target:hover::after,
@@ -127,14 +129,12 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: conic-gradient(
-      from var(--ui-ring-angle),
-      rgba(56, 189, 248, 0) 0deg,
-      rgba(56, 189, 248, 0) 304deg,
-      rgba(34, 211, 238, 0.95) 334deg,
-      rgba(59, 130, 246, 0.7) 348deg,
-      transparent 360deg
-    );
+    background: conic-gradient(from var(--ui-ring-angle),
+        rgba(56, 189, 248, 0) 0deg,
+        rgba(56, 189, 248, 0) 304deg,
+        rgba(34, 211, 238, 0.95) 334deg,
+        rgba(59, 130, 246, 0.7) 348deg,
+        transparent 360deg);
     animation: dark-button-ring-rotate 4.6s linear infinite;
     pointer-events: none;
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -170,14 +170,12 @@
     inset: 0;
     border-radius: inherit;
     padding: 2px;
-    background: conic-gradient(
-      from var(--card-ring-angle),
-      rgba(14, 165, 233, 0) 0deg,
-      rgba(14, 165, 233, 0) 305deg,
-      rgba(14, 165, 233, 0.95) 334deg,
-      rgba(56, 189, 248, 0.62) 350deg,
-      rgba(14, 165, 233, 0) 360deg
-    );
+    background: conic-gradient(from var(--card-ring-angle),
+        rgba(14, 165, 233, 0) 0deg,
+        rgba(14, 165, 233, 0) 305deg,
+        rgba(14, 165, 233, 0.95) 334deg,
+        rgba(56, 189, 248, 0.62) 350deg,
+        rgba(14, 165, 233, 0) 360deg);
     animation: moving-card-ring-rotate 5.4s linear infinite;
     pointer-events: none;
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -188,14 +186,12 @@
   }
 
   .dark .moving-border-card::before {
-    background: conic-gradient(
-      from var(--card-ring-angle),
-      rgba(34, 211, 238, 0) 0deg,
-      rgba(34, 211, 238, 0) 302deg,
-      rgba(34, 211, 238, 1) 334deg,
-      rgba(59, 130, 246, 0.68) 349deg,
-      rgba(34, 211, 238, 0) 360deg
-    );
+    background: conic-gradient(from var(--card-ring-angle),
+        rgba(34, 211, 238, 0) 0deg,
+        rgba(34, 211, 238, 0) 302deg,
+        rgba(34, 211, 238, 1) 334deg,
+        rgba(59, 130, 246, 0.68) 349deg,
+        rgba(34, 211, 238, 0) 360deg);
   }
 
   .ribbon-wave-member {
@@ -216,14 +212,12 @@
     inset: 0;
     border-radius: inherit;
     padding: 1.5px;
-    background: conic-gradient(
-      from var(--card-ring-angle),
-      rgba(56, 189, 248, 0) 0deg,
-      rgba(56, 189, 248, 0) 315deg,
-      rgba(56, 189, 248, 0.9) 340deg,
-      rgba(59, 130, 246, 0.7) 354deg,
-      rgba(56, 189, 248, 0) 360deg
-    );
+    background: conic-gradient(from var(--card-ring-angle),
+        rgba(56, 189, 248, 0) 0deg,
+        rgba(56, 189, 248, 0) 315deg,
+        rgba(56, 189, 248, 0.9) 340deg,
+        rgba(59, 130, 246, 0.7) 354deg,
+        rgba(56, 189, 248, 0) 360deg);
     animation: moving-card-ring-rotate 5.1s linear infinite;
     pointer-events: none;
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -327,4 +321,3 @@
     animation: none;
   }
 }
-

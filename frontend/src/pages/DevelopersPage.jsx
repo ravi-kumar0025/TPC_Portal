@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
-import { Github, Linkedin } from 'lucide-react';
+import { Github, Linkedin, LayoutDashboard } from 'lucide-react';
 import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../assets/logo.png';
+import { useAuth } from '../context/AuthContext';
 
 // Framer Motion Variants for Staggered Entrance
 const containerVariants = {
@@ -63,7 +64,7 @@ const DeveloperCard = ({ member, index }) => {
             >
                 <div className="moving-border-card relative w-full min-h-[360px] rounded-[2rem] p-[2px] overflow-hidden group shadow-[0_0_36px_-16px_rgba(14,165,233,0.45)] dark:shadow-[0_0_44px_-16px_rgba(34,211,238,0.6)]">
                     <div
-                        className="relative w-full min-h-[356px] flex flex-col items-center px-5 py-8 pb-20 rounded-[1.9rem] bg-white/95 border border-blue-100 shadow-[0_20px_54px_-22px_rgba(14,165,233,0.48)] hover:shadow-[0_24px_62px_-20px_rgba(14,165,233,0.56)] transition-all duration-500 overflow-hidden dark:bg-slate-900/95 dark:border-cyan-900/80 dark:shadow-[0_22px_58px_-22px_rgba(34,211,238,0.44)] dark:hover:shadow-[0_28px_66px_-20px_rgba(34,211,238,0.58)]"
+                        className="relative w-full min-h-[356px] flex flex-col items-center px-5 py-8 pb-20 rounded-[1.9rem] bg-white/95 border border-blue-100 shadow-[0_20px_54px_-22px_rgba(14,165,233,0.48)] hover:shadow-[0_24px_62px_-20px_rgba(14,165,233,0.56)] transition-all duration-500 overflow-hidden dark:bg-slate-900/95 dark:border-cyan-900/80 dark:shadow-[0_22px_58px_-22px_rgba(34,211,238,0.2)] dark:hover:shadow-[0_28px_66px_-20px_rgba(34,211,238,0.3)]"
                     >
                         {/* Profile Image */}
                         <div className="relative w-28 h-28 mb-5 z-10">
@@ -112,6 +113,7 @@ const DeveloperCard = ({ member, index }) => {
 export default function DevelopersPage() {
     const [developers, setDevelopers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
 
     useEffect(() => {
         const fetchDevelopers = async () => {
@@ -158,10 +160,19 @@ export default function DevelopersPage() {
                             <Link to="/#contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Contact</Link>
                             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
                             <ThemeToggle />
-                            <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
-                            <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                                Portal Access
-                            </Link>
+                            {user ? (
+                                <Link to={`/dashboard/${user.role}`} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                    <LayoutDashboard size={18} />
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
+                                    <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                                        Portal Access
+                                    </Link>
+                                </>
+                            )}
                         </div>
                         <div className="md:hidden">
                             <ThemeToggle />
