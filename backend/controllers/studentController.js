@@ -27,36 +27,17 @@ exports.getEvents = async (req, res) => {
 
 exports.getAnnouncements = async (req, res) => {
     try {
-        const { branch, program } = req.query;
-
-        const andConditions = [];
-
-        // 1. Filter by branch (targetBranches array), case-insensitive
-        //    Always include announcements targeted to 'all' branches
-        const branchesRegex = [/^all$/i];
-        if (branch && branch.trim() && branch.trim().toLowerCase() !== 'undefined') {
-            branchesRegex.push(new RegExp(`^${branch.trim()}$`, 'i'));
-        }
-        andConditions.push({ targetBranches: { $in: branchesRegex } });
-
-        // 2. Filter by targetAudience (student program → enum mapping), case-insensitive
-        //    Map frontend program strings ('B.Tech', 'M.Tech', 'M.Sc') to schema enums
-        const programMap = {
-            'btech': 'btech', 'b.tech': 'btech', 'b tech': 'btech',
-            'mtech': 'mtech', 'm.tech': 'mtech', 'm tech': 'mtech',
-            'msc': 'msc', 'm.sc': 'msc', 'm sc': 'msc',
-            'phd': 'phd'
-        };
-        const audienceConditions = [{ targetAudience: 'all' }];
-        if (program && program.trim() && program.trim().toLowerCase() !== 'undefined') {
-            const mapped = programMap[program.trim().toLowerCase()];
-            if (mapped) audienceConditions.push({ targetAudience: mapped });
-        }
-        andConditions.push({ $or: audienceConditions });
-
-        const query = { $and: andConditions };
-
-        const announcements = await Announcement.find(query).sort({ createdAt: -1 }).limit(20);
+        // Sort by effective date = max(editedAt, createdAt) so edited announcements
+        // slot into the correct chronological position instead of jumping to the top.
+        const raw = await Announcement.find({})
+            .populate('createdBy', 'fullName email');
+        const announcements = raw
+            .sort((a, b) => {
+                const aDate = Math.max(a.editedAt?.getTime() ?? 0, a.createdAt?.getTime() ?? 0);
+                const bDate = Math.max(b.editedAt?.getTime() ?? 0, b.createdAt?.getTime() ?? 0);
+                return bDate - aDate;
+            })
+            .slice(0, 50);
         res.status(200).json({ announcements });
     } catch (err) {
         console.error('getAnnouncements Error:', err);

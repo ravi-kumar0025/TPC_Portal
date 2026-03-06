@@ -173,32 +173,35 @@ export default function StudentAnnouncements() {
                                         onClick={() => handleExpand(id)}
                                         className="w-full text-left px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4 group"
                                     >
-                                        {/* Left Status & Icon */}
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.color} border shadow-sm`}>
-                                                <Icon className="w-5 h-5" />
-                                            </div>
+                                        {/* Icon */}
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.color} border shadow-sm`}>
+                                            <Icon className="w-5 h-5" />
                                         </div>
 
-                                        {/* Center Content */}
+                                        {/* Content */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-1.5 flex-wrap">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase border ${cfg.color}`}>
+                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold border ${cfg.color}`}>
                                                     {cfg.label}
                                                 </span>
+                                                {a.isEdited && (
+                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                        Edited
+                                                    </span>
+                                                )}
                                                 {isViewed && !isExpanded && (
-                                                    <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full dark:bg-slate-800 dark:text-slate-400 font-medium">Viewed</span>
+                                                    <span className="text-xs text-slate-400 font-medium">· Viewed</span>
                                                 )}
                                             </div>
-                                            <h3 className={`font-bold text-base md:text-lg leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${isViewed && !isExpanded ? 'text-slate-600 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                                            <h3 className={`font-bold text-sm leading-snug group-hover:text-blue-700 transition-colors ${isViewed && !isExpanded ? 'text-slate-500 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'}`}>
                                                 {a.title}
                                             </h3>
                                             {!isExpanded && (
-                                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-1 pr-6">{body}</p>
+                                                <p className="text-xs text-slate-500 mt-1 line-clamp-1">{body}</p>
                                             )}
                                         </div>
 
-                                        {/* Right Date & Chevron */}
+                                        {/* Date & Chevron */}
                                         <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 mt-4 sm:mt-0 flex-shrink-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800 pt-3 sm:pt-0">
                                             <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700">
                                                 <Clock size={14} />
@@ -215,28 +218,34 @@ export default function StudentAnnouncements() {
 
                                     {/* Expanded Detail Panel */}
                                     {isExpanded && (
-                                        <div className="px-6 pb-6 pt-2 border-t border-slate-100 dark:border-slate-800/60 animate-[fade-in-up_0.3s_ease-out]">
-                                            <div className="bg-slate-50/50 rounded-xl p-5 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-700/60 shadow-inner">
-                                                <h4 className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 dark:text-slate-500">
-                                                    <BookOpen size={14} /> Description
-                                                </h4>
-                                                <p className="text-sm md:text-base text-slate-700 leading-relaxed whitespace-pre-wrap dark:text-slate-300">{body}</p>
+                                        <div className="px-5 pb-5 border-t border-slate-100">
+                                            <div className="mt-4 bg-slate-50 rounded-xl p-4 border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 dark:text-slate-400">Details</h4>
+                                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap dark:text-slate-300">{body}</p>
                                             </div>
-                                            <div className="mt-4 flex flex-wrap gap-4 items-center">
+                                            <div className="mt-3 flex flex-wrap gap-3">
+                                                {/* Author */}
+                                                {a.createdBy && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 w-full">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                                                        <span>By <span className="font-semibold text-slate-700 dark:text-slate-200">{a.createdBy?.fullName || a.createdBy?.email || 'Admin'}</span></span>
+                                                        {a.isEdited && a.editedAt && (
+                                                            <span className="ml-2 text-amber-500 dark:text-amber-400">· edited {format(new Date(a.editedAt), 'dd MMM yyyy, hh:mm a')}</span>
+                                                        )}
+                                                    </div>
+                                                )}
                                                 {a.targetBranches?.length > 0 && (
-                                                    <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Branches</span>
-                                                        <div className="flex flex-wrap gap-1.5">
-                                                            {a.targetBranches.map(b => (
-                                                                <span key={b} className="text-xs bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md font-bold dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800">{b}</span>
-                                                            ))}
-                                                        </div>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="text-xs text-slate-400 font-semibold">Branches:</span>
+                                                        {a.targetBranches.map(b => (
+                                                            <span key={b} className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-lg font-medium">{b}</span>
+                                                        ))}
                                                     </div>
                                                 )}
                                                 {a.targetAudience && a.targetAudience !== 'all' && (
-                                                    <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Audience</span>
-                                                        <span className="text-xs bg-violet-100 text-violet-700 border border-violet-200 px-2 py-0.5 rounded-md font-bold capitalize dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800">{a.targetAudience}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-400 font-semibold">Audience:</span>
+                                                        <span className="text-xs bg-violet-50 text-violet-600 border border-violet-100 px-2 py-0.5 rounded-lg font-medium capitalize">{a.targetAudience}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -246,49 +255,6 @@ export default function StudentAnnouncements() {
                             );
                         })}
                     </div>
-
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between pt-6 mt-4 border-t border-slate-200 dark:border-slate-800">
-                            <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                                Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} of {filtered.length} entries
-                            </span>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                    className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
-                                    aria-label="Previous pane"
-                                >
-                                    <ChevronLeft size={18} />
-                                </button>
-
-                                <div className="flex items-center gap-1">
-                                    {[...Array(totalPages)].map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setCurrentPage(i + 1)}
-                                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${currentPage === i + 1
-                                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                                                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-slate-200'
-                                                }`}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages}
-                                    className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
-                                    aria-label="Next page"
-                                >
-                                    <ChevronRight size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </>
             )}
         </div>

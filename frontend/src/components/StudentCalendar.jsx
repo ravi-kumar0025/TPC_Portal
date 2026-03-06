@@ -72,6 +72,7 @@ const StudentCalendar = () => {
 
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [applyingId, setApplyingId] = useState(null);
@@ -138,11 +139,28 @@ const StudentCalendar = () => {
     }, [fetchCalendar]);
 
     const handleSelectEvent = (event) => {
+        const idx = events.findIndex(e => e.id === event.id || e.title === event.title);
         setSelectedEvent(event);
+        setSelectedIndex(idx >= 0 ? idx : null);
     };
 
     const closeDrawer = () => {
         setSelectedEvent(null);
+        setSelectedIndex(null);
+    };
+
+    const goPrevEvent = () => {
+        if (selectedIndex === null || selectedIndex <= 0) return;
+        const newIndex = selectedIndex - 1;
+        setSelectedEvent(events[newIndex]);
+        setSelectedIndex(newIndex);
+    };
+
+    const goNextEvent = () => {
+        if (selectedIndex === null || selectedIndex >= events.length - 1) return;
+        const newIndex = selectedIndex + 1;
+        setSelectedEvent(events[newIndex]);
+        setSelectedIndex(newIndex);
     };
 
     const handleApply = async (eventId) => {
@@ -374,19 +392,39 @@ const StudentCalendar = () => {
                         >
                             {/* Header */}
                             <div className="sticky top-0 bg-white z-10 p-5 pb-3 border-b border-slate-100 dark:bg-slate-900 dark:border-slate-700">
-                                <div className="flex justify-between items-start">
+                                <div className="flex justify-between items-center">
                                     <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-300">
                                         {getEventIcon(selectedEvent.type)}
                                         <span className="font-semibold uppercase text-xs tracking-wider">
                                             {selectedEvent.type.replace('_', ' ')}
                                         </span>
                                     </div>
-                                    <button
-                                        onClick={closeDrawer}
-                                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
+                                    {/* Prev / Next / Close controls */}
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={goPrevEvent}
+                                            disabled={selectedIndex === null || selectedIndex <= 0}
+                                            title="Previous event"
+                                            className="p-1.5 rounded-full transition-colors text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                        </button>
+
+                                        <button
+                                            onClick={goNextEvent}
+                                            disabled={selectedIndex === null || selectedIndex >= events.length - 1}
+                                            title="Next event"
+                                            className="p-1.5 rounded-full transition-colors text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                        </button>
+                                        <button
+                                            onClick={closeDrawer}
+                                            className="ml-1 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -397,14 +435,21 @@ const StudentCalendar = () => {
                                     <h2 className="text-xl font-bold text-gray-900 leading-tight mb-2 dark:text-slate-100">
                                         {selectedEvent.title}
                                     </h2>
-                                    {(() => {
-                                        const status = getStatusLabel(selectedEvent, userEmail);
-                                        return (
-                                            <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${status.bg}`}>
-                                                {status.text}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {(() => {
+                                            const status = getStatusLabel(selectedEvent, userEmail);
+                                            return (
+                                                <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${status.bg}`}>
+                                                    {status.text}
+                                                </span>
+                                            );
+                                        })()}
+                                        {selectedEvent.extendedProps?.isEdited && (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                Edited
                                             </span>
-                                        );
-                                    })()}
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Dates */}
@@ -428,6 +473,13 @@ const StudentCalendar = () => {
                                     {selectedEvent.extendedProps?.deadline && (
                                         <div className="mt-2 p-2.5 bg-red-50 text-red-700 rounded-lg text-xs border border-red-100 font-medium dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60">
                                             ⏰ Deadline: {format(new Date(selectedEvent.extendedProps.deadline), 'PPP')}
+                                        </div>
+                                    )}
+                                    {/* Author */}
+                                    {selectedEvent.extendedProps?.createdBy && (
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                                            <span>By <span className="font-semibold text-slate-700 dark:text-slate-200">{selectedEvent.extendedProps.createdBy?.fullName || selectedEvent.extendedProps.createdBy?.email || 'Admin'}</span></span>
                                         </div>
                                     )}
                                 </div>

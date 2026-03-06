@@ -3,21 +3,19 @@ const Announcement = require('../models/Announcement');
 
 exports.getUnifiedCalendar = async (req, res) => {
     try {
-        let userBranch = req.query.branch;
-
-        if (!userBranch && req.user && req.user.department) {
-            userBranch = req.user.department;
-        }
-
-        const query = {};
-        if (userBranch) {
-            query.targetBranches = { $in: [new RegExp(`^${userBranch}$`, 'i'), /^all$/i] };
-        }
-
-        const [events, announcements] = await Promise.all([
-            Event.find(query),
-            Announcement.find(query)
+        // Fetch all events and all announcements — no branch filtering here,
+        // because announcements with empty targetBranches mean "all branches".
+        const [events, rawAnnouncements] = await Promise.all([
+            Event.find({}).populate('createdBy', 'fullName email'),
+            Announcement.find({}).populate('createdBy', 'fullName email')
         ]);
+
+        // Sort announcements by effective date = max(editedAt, createdAt)
+        const announcements = rawAnnouncements.sort((a, b) => {
+            const aDate = Math.max(a.editedAt?.getTime() ?? 0, a.createdAt?.getTime() ?? 0);
+            const bDate = Math.max(b.editedAt?.getTime() ?? 0, b.createdAt?.getTime() ?? 0);
+            return bDate - aDate;
+        });
 
         const calendarItems = [];
 
@@ -38,14 +36,25 @@ exports.getUnifiedCalendar = async (req, res) => {
         });
 
         announcements.forEach(ann => {
+            // Use editedAt as the calendar date if the announcement was edited
+            // so it floats up to the edit date on the student calendar
+            const displayDate = ann.isEdited && ann.editedAt
+                ? new Date(ann.editedAt).toISOString()
+                : (ann.createdAt ? new Date(ann.createdAt).toISOString() : null);
+
             calendarItems.push({
                 id: ann._id,
-                title: ann.title,
-                start: ann.createdAt ? new Date(ann.createdAt).toISOString() : null,
-                end: ann.createdAt ? new Date(ann.createdAt).toISOString() : null,
+                title: ann.isEdited ? `✎ ${ann.title}` : ann.title,
+                start: displayDate,
+                end: displayDate,
                 type: 'announcement',
                 appliedStudents: [],
-                extendedProps: ann.toObject()
+                extendedProps: {
+                    ...ann.toObject(),
+                    // Expose edit metadata explicitly so the detail pane can read them
+                    isEdited: ann.isEdited,
+                    editedAt: ann.editedAt,
+                }
             });
         });
 
@@ -55,3 +64,4 @@ exports.getUnifiedCalendar = async (req, res) => {
         res.status(500).json({ message: 'Internal server error while fetching unified calendar' });
     }
 };
+

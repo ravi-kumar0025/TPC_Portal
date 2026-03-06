@@ -19,6 +19,13 @@ const announcementSchema = new mongoose.Schema({
         type: String,
         default: []
     }],
+    isEdited: {
+        type: Boolean,
+        default: false
+    },
+    editedAt: {
+        type: Date
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
