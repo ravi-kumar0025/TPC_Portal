@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, MapPin, Mail, Phone, ExternalLink } from 'lucide-react';
+import { BookOpen, MapPin, Mail, Phone, ExternalLink, LayoutDashboard } from 'lucide-react';
 import HomePageCharts from '../components/HomePageCharts';
 import logo from '../assets/logo.png';
 import DevelopersRibbon from '../components/DevelopersRibbon';
 import ThemeToggle from '../components/ThemeToggle';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
+    const { user } = useAuth();
     return (
         <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
             {/* Navbar */}
@@ -29,10 +31,19 @@ export default function LandingPage() {
                             <a href="#contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Contact</a>
                             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
                             <ThemeToggle />
-                            <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
-                            <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                                Portal Access
-                            </Link>
+                            {user ? (
+                                <Link to={`/dashboard/${user.role}`} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                    <LayoutDashboard size={18} />
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
+                                    <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                                        Portal Access
+                                    </Link>
+                                </>
+                            )}
                         </div>
                         <div className="md:hidden">
                             <ThemeToggle />
@@ -65,13 +76,22 @@ export default function LandingPage() {
                                 to connect with global industry leaders and shape the future of technology.
                             </p>
                             <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-                                <Link to="/login" className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
-                                    Recruit at IITP
-                                    <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                </Link>
-                                <Link to="/login" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-300 text-center dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-700">
-                                    Student Login
-                                </Link>
+                                {user ? (
+                                    <Link to={`/dashboard/${user.role}`} className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
+                                        Go to Dashboard
+                                        <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <Link to="/login" className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
+                                            Recruit at IITP
+                                            <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        </Link>
+                                        <Link to="/login" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-300 text-center dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-700">
+                                            Student Login
+                                        </Link>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -144,7 +164,13 @@ export default function LandingPage() {
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Student Guidelines</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Company Brochure</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Placement Policy</a></li>
-                                <li><Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Login Portal &rarr;</Link></li>
+                                <li>
+                                    {user ? (
+                                        <Link to={`/dashboard/${user.role}`} className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Dashboard &rarr;</Link>
+                                    ) : (
+                                        <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Login Portal &rarr;</Link>
+                                    )}
+                                </li>
                             </ul>
                         </div>
                     </div>

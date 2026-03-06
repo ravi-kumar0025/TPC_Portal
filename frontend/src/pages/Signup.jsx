@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Mail, KeyRound, ChevronRight, Loader2, House } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Signup() {
@@ -33,8 +34,12 @@ export default function Signup() {
     // Admin Fields
     const [adminType, setAdminType] = useState('announcement_admin');
 
-    const { login } = useAuth();
+    const { user, login } = useAuth();
     const navigate = useNavigate();
+
+    if (user) {
+        return <Navigate to={`/dashboard/${user.role}`} replace />;
+    }
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();

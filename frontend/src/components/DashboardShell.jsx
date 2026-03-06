@@ -13,10 +13,12 @@ export default function DashboardShell() {
         return <Navigate to="/login" replace />;
     }
 
-    // Redirect to correct sub-dashboard if user hits /dashboard directly
+    // Prevent access to other roles' dashboards by enforcing namespace prefix
     const pathname = window.location.pathname;
-    if (pathname === '/dashboard' || pathname === '/dashboard/') {
-        return <Navigate to={`/dashboard/${user.role}`} replace />;
+    const allowedPrefix = `/dashboard/${user.role}`;
+
+    if (pathname === '/dashboard' || pathname === '/dashboard/' || !pathname.startsWith(allowedPrefix)) {
+        return <Navigate to={allowedPrefix} replace />;
     }
 
     const handleLogout = () => {
@@ -25,7 +27,10 @@ export default function DashboardShell() {
     };
 
     const SidebarItem = ({ icon: Icon, label, path, disabled }) => {
-        const isActive = window.location.pathname.includes(path);
+        const isDashboardHome = path === `/dashboard/${user.role}`;
+        const isActive = isDashboardHome
+            ? window.location.pathname === path || window.location.pathname === `${path}/`
+            : window.location.pathname.includes(path);
         return (
             <button
                 disabled={disabled}
