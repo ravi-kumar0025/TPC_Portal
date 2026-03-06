@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, MapPin, Mail, Phone, ExternalLink, Menu, X, Home, Briefcase, Code, BarChart2, LayoutDashboard, LogOut } from 'lucide-react';
+import { BookOpen, MapPin, Mail, Phone, ExternalLink, LayoutDashboard, Home, Briefcase, Code, BarChart2, Menu, X } from 'lucide-react';
 import HomePageCharts from '../components/HomePageCharts';
 import logo from '../assets/logo.png';
 import DevelopersRibbon from '../components/DevelopersRibbon';
@@ -9,8 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { token, logout } = useAuth();
-
+    const { user, token, logout } = useAuth();
     return (
         <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
             {/* Navbar */}
@@ -50,28 +49,18 @@ export default function LandingPage() {
                             </a>
                             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
                             <ThemeToggle />
-                            {token ? (
-                                <div className="flex items-center space-x-2 lg:space-x-4">
-                                    <Link to="/dashboard" className="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-1.5" title="Dashboard">
-                                        <LayoutDashboard className="w-4 h-4 lg:hidden" />
-                                        <span className="hidden lg:block">Dashboard</span>
-                                    </Link>
-                                    <button
-                                        onClick={logout}
-                                        className="text-red-500 font-semibold hover:text-red-600 transition-colors p-2 lg:p-0 flex items-center gap-1.5"
-                                        title="Logout"
-                                    >
-                                        <LogOut className="w-5 h-5 lg:hidden" />
-                                        <span className="hidden lg:block">Logout</span>
-                                    </button>
-                                </div>
+                            {user ? (
+                                <Link to={`/dashboard/${user.role}`} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                    <LayoutDashboard size={18} />
+                                    Dashboard
+                                </Link>
                             ) : (
-                                <div className="flex items-center space-x-2 lg:space-x-4">
-                                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors px-2 lg:px-0 text-sm lg:text-base">Log in</Link>
-                                    <Link to="/login" className="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg font-medium text-sm lg:text-base hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                                <>
+                                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
+                                    <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                                         Portal Access
                                     </Link>
-                                </div>
+                                </>
                             )}
                         </div>
                         <div className="md:hidden flex items-center gap-4">
@@ -145,13 +134,22 @@ export default function LandingPage() {
                                 to connect with global industry leaders and shape the future of technology.
                             </p>
                             <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-                                <Link to="/login" className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
-                                    Recruit at IITP
-                                    <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                </Link>
-                                <Link to="/login" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-300 text-center dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-700">
-                                    Student Login
-                                </Link>
+                                {user ? (
+                                    <Link to={`/dashboard/${user.role}`} className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
+                                        Go to Dashboard
+                                        <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <Link to="/login" className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group">
+                                            Recruit at IITP
+                                            <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        </Link>
+                                        <Link to="/login" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-300 text-center dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-700">
+                                            Student Login
+                                        </Link>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -224,7 +222,13 @@ export default function LandingPage() {
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Student Guidelines</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Company Brochure</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><BookOpen size={14} /> Placement Policy</a></li>
-                                <li><Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Login Portal &rarr;</Link></li>
+                                <li>
+                                    {user ? (
+                                        <Link to={`/dashboard/${user.role}`} className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Dashboard &rarr;</Link>
+                                    ) : (
+                                        <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors mt-2 inline-block">Login Portal &rarr;</Link>
+                                    )}
+                                </li>
                             </ul>
                         </div>
                     </div>

@@ -169,7 +169,7 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
 
     return (
         <div id="stats" className="w-full bg-[#F9FAFB] font-sans dark:bg-slate-950">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-32">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 space-y-32">
 
                 {/* --- ROW A: Salary Trends (Text Left, Graph Right) --- */}
                 <div className="flex flex-col lg:flex-row items-center gap-16">
@@ -317,10 +317,22 @@ export default function EditorialPlacementCharts({ data = mockLiveState }) {
                                         <Pie
                                             data={data.sectors}
                                             cx="50%" cy="50%"
-                                            innerRadius={60} outerRadius={85}
+                                            innerRadius={50} outerRadius={75}
                                             paddingAngle={4}
                                             dataKey="count"
                                             stroke="none"
+                                            label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                const radius = outerRadius * 1.35;
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                                                return (
+                                                    <text x={x} y={y} fill={isDark ? '#cbd5e1' : '#475569'} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize="11" fontWeight="600">
+                                                        {name} ({(percent * 100).toFixed(0)}%)
+                                                    </text>
+                                                );
+                                            }}
                                         >
                                             {data.sectors.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />

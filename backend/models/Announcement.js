@@ -10,21 +10,36 @@ const announcementSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    targetAudience: {
+    targetPrograms: [{
         type: String,
-        enum: ['all', 'btech', 'mtech', 'msc', 'phd'],
-        default: 'all'
-    },
+        default: []
+    }],
     targetBranches: [{
         type: String,
         default: []
     }],
+    targetYears: [{
+        type: String,
+        default: []
+    }],
+    isEdited: {
+        type: Boolean,
+        default: false
+    },
+    editedAt: {
+        type: Date
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     }
 }, { timestamps: true });
+
+announcementSchema.index({ createdAt: -1 });
+announcementSchema.index({ targetPrograms: 1 });
+announcementSchema.index({ targetBranches: 1 });
+announcementSchema.index({ targetYears: 1 });
 
 const Announcement = mongoose.model('Announcement', announcementSchema);
 

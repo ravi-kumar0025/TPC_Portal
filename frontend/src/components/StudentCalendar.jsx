@@ -9,7 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, Briefcase, Megaphone, MonitorPlay,
-    Calendar as CalendarIcon, CheckCircle2, ExternalLink, Clock, MapPin, Loader2
+    Calendar as CalendarIcon, CheckCircle2, ExternalLink, Clock, MapPin, Loader2, AlertTriangle
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -72,25 +72,35 @@ const StudentCalendar = () => {
 
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [applyingId, setApplyingId] = useState(null);
     const [applySuccess, setApplySuccess] = useState({});
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    // ±2 months navigation bounds
-    const { minDate, maxDate } = useMemo(() => {
-        const now = new Date();
-        const min = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-        const max = new Date(now.getFullYear(), now.getMonth() + 3, 0); // last day of +2 month
-        return { minDate: min, maxDate: max };
-    }, []);
+    const isPendingOrUnsubmitted = user?.verificationStatus === 'pending' || user?.verificationStatus === 'unsubmitted';
 
-    const handleNavigate = (newDate) => {
-        if (newDate >= minDate && newDate <= maxDate) {
-            setCurrentDate(newDate);
-        }
+    // ±2 months navigation bounds (relative to today, computed once)
+    const today = useMemo(() => new Date(), []);
+    const minMonth = useMemo(() => new Date(today.getFullYear(), today.getMonth() - 2, 1), [today]);
+    const maxMonth = useMemo(() => new Date(today.getFullYear(), today.getMonth() + 2, 1), [today]);
+
+    // Returns true if the viewed month equals the (year, month) of the given boundary
+    const isAtMin = currentDate.getFullYear() === minMonth.getFullYear() && currentDate.getMonth() === minMonth.getMonth();
+    const isAtMax = currentDate.getFullYear() === maxMonth.getFullYear() && currentDate.getMonth() === maxMonth.getMonth();
+
+    const goToPrev = () => {
+        if (isAtMin) return;
+        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
     };
+
+    const goToNext = () => {
+        if (isAtMax) return;
+        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    };
+
+    const goToToday = () => setCurrentDate(new Date());
 
     const fetchCalendar = useCallback(async () => {
         try {
@@ -131,11 +141,28 @@ const StudentCalendar = () => {
     }, [fetchCalendar]);
 
     const handleSelectEvent = (event) => {
+        const idx = events.findIndex(e => e.id === event.id || e.title === event.title);
         setSelectedEvent(event);
+        setSelectedIndex(idx >= 0 ? idx : null);
     };
 
     const closeDrawer = () => {
         setSelectedEvent(null);
+        setSelectedIndex(null);
+    };
+
+    const goPrevEvent = () => {
+        if (selectedIndex === null || selectedIndex <= 0) return;
+        const newIndex = selectedIndex - 1;
+        setSelectedEvent(events[newIndex]);
+        setSelectedIndex(newIndex);
+    };
+
+    const goNextEvent = () => {
+        if (selectedIndex === null || selectedIndex >= events.length - 1) return;
+        const newIndex = selectedIndex + 1;
+        setSelectedEvent(events[newIndex]);
+        setSelectedIndex(newIndex);
     };
 
     const handleApply = async (eventId) => {
@@ -199,6 +226,24 @@ const StudentCalendar = () => {
     };
 
     // ─── Render ───────────────────────────────────────────────────
+    if (isPendingOrUnsubmitted) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[70vh] text-center max-w-md mx-auto animate-[fade-in-up_0.5s_ease-out]">
+                <div className="w-20 h-20 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center mb-6 shadow-sm border border-yellow-100 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900">
+                    <AlertTriangle size={36} strokeWidth={1.5} />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                    {user?.verificationStatus === 'unsubmitted' ? 'Verification Required' : 'Account Under Review'}
+                </h2>
+                <p className="text-slate-500 dark:text-slate-300 mb-8 leading-relaxed">
+                    {user?.verificationStatus === 'unsubmitted'
+                        ? 'You must send a verification request from the "Verify Yourself" tab. Once verified by the TPC, you will be able to view and apply to events on the placement calendar.'
+                        : 'Your student profile is currently being verified by the Training and Placement Cell. Access to the placement calendar and applications will be granted once verified.'}
+                </p>
+            </div>
+        );
+    }
+
     if (loading) return (
         <div className="flex items-center justify-center h-[70vh]">
             <div className="flex flex-col items-center gap-3 text-slate-500">
@@ -227,31 +272,59 @@ const StudentCalendar = () => {
 
     return (
         <div className="h-[calc(100vh-110px)]">
-            {/* Legend Bar */}
-            <div className="flex items-center gap-4 mb-4 flex-wrap px-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-300">Legend:</span>
-                {[
-                    { color: COLORS.APPLIED, label: 'Applied' },
-                    { color: COLORS.ACTIVE, label: 'Active' },
-                    { color: COLORS.UPCOMING, label: 'Upcoming' },
-                    { color: COLORS.PAST, label: 'Past' },
-                    { color: COLORS.ANNOUNCEMENT, label: 'Announcement' },
-                ].map(item => (
-                    <div key={item.label} className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: item.color }} />
-                        <span className="text-xs text-slate-600 font-medium dark:text-slate-300">{item.label}</span>
-                    </div>
-                ))}
-            </div>
-
-            <div className="flex h-[calc(100%-40px)] w-full overflow-hidden bg-gray-50 rounded-xl relative border border-slate-200 shadow-sm">
-                {/* ─── Calendar Grid (70%) ─── */}
+            <div className="flex h-full w-full overflow-hidden bg-white rounded-xl relative border border-slate-200 shadow-sm">
+                {/* ─── Calendar Grid ─── */}
                 <motion.div
                     animate={{ width: selectedEvent ? '68%' : '100%' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="calendar-color-lock student-calendar-surface h-full p-4 bg-white"
+                    className="calendar-color-lock student-calendar-surface flex flex-col h-full bg-white"
                     style={{ colorScheme: 'light' }}
                 >
+                    {/* ─── Legend row ─── */}
+                    <div className="flex items-center gap-4 flex-wrap px-4 pt-3 pb-2 border-b border-slate-100">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Legend:</span>
+                        {[
+                            { color: COLORS.APPLIED, label: 'Applied' },
+                            { color: COLORS.ACTIVE, label: 'Active' },
+                            { color: COLORS.UPCOMING, label: 'Upcoming' },
+                            { color: COLORS.PAST, label: 'Past' },
+                            { color: COLORS.ANNOUNCEMENT, label: 'Announcement' },
+                        ].map(item => (
+                            <div key={item.label} className="flex items-center gap-1.5">
+                                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: item.color }} />
+                                <span className="text-xs text-slate-600 font-medium">{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ─── Toolbar: buttons left, month centred ─── */}
+                    <div className="relative flex items-center px-4 py-2 border-b border-slate-100">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={goToPrev}
+                                disabled={isAtMin}
+                                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                            >
+                                ‹ Back
+                            </button>
+                            <button
+                                onClick={goToToday}
+                                className="px-3 py-1.5 rounded-lg border border-blue-300 bg-blue-50 text-blue-700 text-sm font-semibold hover:bg-blue-100 transition-colors shadow-sm"
+                            >
+                                Today
+                            </button>
+                            <button
+                                onClick={goToNext}
+                                disabled={isAtMax}
+                                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                            >
+                                Next ›
+                            </button>
+                        </div>
+                        <span className="absolute left-1/2 -translate-x-1/2 text-sm font-bold text-slate-700 pointer-events-none">
+                            {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                        </span>
+                    </div>
                     <style>{`
                         /* Force light-theme for every internal rbc element —
                            overrides the global color-scheme:dark cascade */
@@ -308,19 +381,23 @@ const StudentCalendar = () => {
                             color: #3b82f6 !important;
                         }
                     `}</style>
-                    <Calendar
-                        localizer={localizer}
-                        events={events}
-                        startAccessor="start"
-                        endAccessor="end"
-                        style={{ height: '100%' }}
-                        date={currentDate}
-                        onNavigate={handleNavigate}
-                        onSelectEvent={handleSelectEvent}
-                        eventPropGetter={eventPropGetter}
-                        views={['month']}
-                        popup={true}
-                    />
+                    <div className="flex-1 overflow-hidden">
+                        <Calendar
+                            localizer={localizer}
+                            events={events}
+                            startAccessor="start"
+                            endAccessor="end"
+                            style={{ height: '100%' }}
+                            date={currentDate}
+                            onNavigate={() => { }}
+                            onSelectEvent={handleSelectEvent}
+                            eventPropGetter={eventPropGetter}
+                            views={['month']}
+                            defaultView="month"
+                            toolbar={false}
+                            popup={true}
+                        />
+                    </div>
                 </motion.div>
 
                 {/* ─── Details Pane (32%) ─── */}
@@ -335,19 +412,39 @@ const StudentCalendar = () => {
                         >
                             {/* Header */}
                             <div className="sticky top-0 bg-white z-10 p-5 pb-3 border-b border-slate-100 dark:bg-slate-900 dark:border-slate-700">
-                                <div className="flex justify-between items-start">
+                                <div className="flex justify-between items-center">
                                     <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-300">
                                         {getEventIcon(selectedEvent.type)}
                                         <span className="font-semibold uppercase text-xs tracking-wider">
                                             {selectedEvent.type.replace('_', ' ')}
                                         </span>
                                     </div>
-                                    <button
-                                        onClick={closeDrawer}
-                                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
+                                    {/* Prev / Next / Close controls */}
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={goPrevEvent}
+                                            disabled={selectedIndex === null || selectedIndex <= 0}
+                                            title="Previous event"
+                                            className="p-1.5 rounded-full transition-colors text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                        </button>
+
+                                        <button
+                                            onClick={goNextEvent}
+                                            disabled={selectedIndex === null || selectedIndex >= events.length - 1}
+                                            title="Next event"
+                                            className="p-1.5 rounded-full transition-colors text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                        </button>
+                                        <button
+                                            onClick={closeDrawer}
+                                            className="ml-1 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -358,14 +455,21 @@ const StudentCalendar = () => {
                                     <h2 className="text-xl font-bold text-gray-900 leading-tight mb-2 dark:text-slate-100">
                                         {selectedEvent.title}
                                     </h2>
-                                    {(() => {
-                                        const status = getStatusLabel(selectedEvent, userEmail);
-                                        return (
-                                            <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${status.bg}`}>
-                                                {status.text}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {(() => {
+                                            const status = getStatusLabel(selectedEvent, userEmail);
+                                            return (
+                                                <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${status.bg}`}>
+                                                    {status.text}
+                                                </span>
+                                            );
+                                        })()}
+                                        {selectedEvent.extendedProps?.isEdited && (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                Edited
                                             </span>
-                                        );
-                                    })()}
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Dates */}
@@ -389,6 +493,13 @@ const StudentCalendar = () => {
                                     {selectedEvent.extendedProps?.deadline && (
                                         <div className="mt-2 p-2.5 bg-red-50 text-red-700 rounded-lg text-xs border border-red-100 font-medium dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60">
                                             ⏰ Deadline: {format(new Date(selectedEvent.extendedProps.deadline), 'PPP')}
+                                        </div>
+                                    )}
+                                    {/* Author */}
+                                    {selectedEvent.extendedProps?.createdBy && (
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                                            <span>By <span className="font-semibold text-slate-700 dark:text-slate-200">{selectedEvent.extendedProps.createdBy?.fullName || selectedEvent.extendedProps.createdBy?.email || 'Admin'}</span></span>
                                         </div>
                                     )}
                                 </div>

@@ -67,6 +67,7 @@
     transform: translate3d(0, 0, 0);
   }
 
+
   25% {
     transform: translate3d(0, -8px, 0);
   }
@@ -99,6 +100,10 @@
   }
 
   .dark .cursor-glow-target::after {
+    background: radial-gradient(80px circle at var(--cursor-glow-x, 50%) var(--cursor-glow-y, 50%),
+        rgba(56, 189, 248, 0.15) 0%,
+        rgba(59, 130, 246, 0.08) 40%,
+        rgba(56, 189, 248, 0) 70%);
     background: radial-gradient(110px circle at var(--cursor-glow-x, 50%) var(--cursor-glow-y, 50%),
         rgba(56, 189, 248, 0.12) 0%,
         rgba(59, 130, 246, 0.06) 36%,
@@ -320,56 +325,4 @@
   .ribbon-wave-member {
     animation: none;
   }
-}
-
-/* React Big Calendar High Contrast Overrides */
-.rbc-calendar {
-  @apply text-slate-900 font-medium;
-}
-
-.rbc-header {
-  @apply text-slate-900 font-bold bg-slate-100 py-2 border-b-2 border-slate-300;
-}
-
-.rbc-date-cell {
-  @apply text-slate-900 font-bold pr-2 pt-1;
-}
-
-.rbc-event {
-  @apply bg-blue-600 font-semibold text-white shadow-sm border border-blue-700;
-}
-
-.rbc-off-range-bg {
-  @apply bg-slate-100 opacity-60;
-}
-
-.rbc-today {
-  @apply bg-blue-50;
-}
-
-.rbc-event-content {
-  @apply font-bold tracking-wide;
-}
-
-.rbc-month-view,
-.rbc-time-view,
-.rbc-agenda-view {
-  @apply border-slate-300 border-2;
-}
-
-.rbc-month-row,
-.rbc-day-bg {
-  @apply border-slate-300 border-l border-b;
-}
-
-.rbc-toolbar button {
-  @apply font-semibold text-slate-800 border-slate-300;
-}
-
-.rbc-toolbar button.rbc-active {
-  @apply bg-slate-200 text-blue-800 shadow-inner font-bold;
-}
-
-.rbc-toolbar-label {
-  @apply font-bold text-slate-900 text-lg;
 }

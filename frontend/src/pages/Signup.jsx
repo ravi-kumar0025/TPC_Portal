@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Mail, KeyRound, ChevronRight, Loader2, House } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Signup() {
@@ -22,6 +23,7 @@ export default function Signup() {
     const [department, setDepartment] = useState('');
     const [program, setProgram] = useState('B.Tech');
     const [graduationYear, setGraduationYear] = useState('');
+    const [currentYearOfStudy, setCurrentYearOfStudy] = useState('');
 
     // Company Fields
     const [companyName, setCompanyName] = useState('');
@@ -33,8 +35,12 @@ export default function Signup() {
     // Admin Fields
     const [adminType, setAdminType] = useState('announcement_admin');
 
-    const { login } = useAuth();
+    const { user, login } = useAuth();
     const navigate = useNavigate();
+
+    if (user) {
+        return <Navigate to={`/dashboard/${user.role}`} replace />;
+    }
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();
@@ -44,7 +50,7 @@ export default function Signup() {
         let payload = { email, role };
 
         if (role === 'student') {
-            payload = { ...payload, fullName, rollNumber, department, program, graduationYear: Number(graduationYear) };
+            payload = { ...payload, fullName, rollNumber, department, program, graduationYear: Number(graduationYear), currentYearOfStudy };
         } else if (role === 'company') {
             payload = { ...payload, companyName, companyEmail, companyWebsite, HRContactName, HRContactEmail };
         } else if (role === 'admin') {
@@ -141,6 +147,14 @@ export default function Signup() {
                                         </select>
                                         <input required type="number" placeholder="Grad Year" value={graduationYear} onChange={e => setGraduationYear(e.target.value)} className={inputStyle} />
                                     </div>
+                                    <select required value={currentYearOfStudy} onChange={e => setCurrentYearOfStudy(e.target.value)} className={inputStyle}>
+                                        <option value="" disabled>Select Current Year of Study</option>
+                                        <option value="1st Year">1st Year</option>
+                                        <option value="2nd Year">2nd Year</option>
+                                        <option value="3rd Year">3rd Year</option>
+                                        <option value="4th Year">4th Year</option>
+                                        <option value="5th Year">5th Year</option>
+                                    </select>
                                 </div>
                             )}
 

@@ -29,8 +29,7 @@ const TEAM_MEMBERS = [
 
 export default function DevelopersRibbon() {
     return (
-        <section className="relative bg-white py-24 border-t border-gray-100 overflow-hidden dark:bg-slate-950 dark:border-slate-800">
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_65%)] dark:bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.22),transparent_62%)]" />
+        <section className="relative bg-white pb-24 pt-12 border-t border-gray-100 overflow-hidden dark:bg-slate-950 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-2 dark:text-slate-100">Developed By</h3>
                 <p className="text-sm text-gray-500 font-light mb-12 max-w-lg mx-auto dark:text-slate-400">
