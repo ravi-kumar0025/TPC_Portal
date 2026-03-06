@@ -28,6 +28,7 @@ export default function StudentDashboard() {
     const [events, setEvents] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const [viewedIds, setViewedIds] = useState(new Set());
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -78,16 +79,9 @@ export default function StudentDashboard() {
 
     const fetchAnnouncements = async () => {
         try {
-            // Use the student's actual department and program from their profile
-            const department = user?.department?.trim() || '';
-            const program = user?.program?.trim() || '';
-
-            const params = new URLSearchParams();
-            if (department) params.append('branch', department);
-            if (program) params.append('program', program);
-
+            // Fetch all announcements — no filtering on the client
             const { data } = await axios.get(
-                `http://localhost:5000/api/student/announcements?${params.toString()}`,
+                'http://localhost:5000/api/student/announcements',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setAnnouncements(data.announcements);
@@ -135,23 +129,77 @@ export default function StudentDashboard() {
         };
     };
 
-    // Dashboard calendar shows only announcements
-    const calendarEvents = announcements.map(a => ({
-        id: a._id,
-        title: a.title,
-        start: new Date(a.createdAt),
-        end: new Date(new Date(a.createdAt).getTime() + 60 * 60 * 1000),
-        type: a.type || 'announcement',
-        description: a.content || a.description
-    }));
+    // Dashboard calendar shows all announcements
+    // If an announcement was edited, use editedAt so it floats to today on the calendar
+    const calendarEvents = announcements.map(a => {
+        const eventDate = new Date(a.editedAt || a.createdAt);
+        return {
+            id: a._id,
+            title: a.isEdited ? `✎ ${a.title}` : a.title,
+            start: eventDate,
+            end: new Date(eventDate.getTime() + 60 * 60 * 1000),
+            type: a.type || 'announcement',
+            description: a.content || a.description,
+            targetAudience: a.targetAudience,
+            targetBranches: a.targetBranches || [],
+            isEdited: a.isEdited,
+            createdBy: a.createdBy,
+        };
+    });
 
     const handleSelectEvent = (event) => {
+        // Derive index from announcements array — avoids BigCalendar passing SyntheticEvent as 2nd arg
+        const idx = announcements.findIndex(a => a._id === event.id);
         setSelectedEvent(event);
+        setSelectedIndex(idx >= 0 ? idx : null);
         setViewedIds(prev => new Set([...prev, event.id || event.title]));
+    };
+
+    const goToPrevAnnouncement = () => {
+        if (selectedIndex === null || selectedIndex <= 0) return;
+        const newIndex = selectedIndex - 1;
+        const a = announcements[newIndex];
+        const eventDate = new Date(a.editedAt || a.createdAt);
+        const ev = {
+            id: a._id, title: a.title,
+            start: eventDate,
+            end: new Date(eventDate.getTime() + 60 * 60 * 1000),
+            type: a.type || 'announcement',
+            description: a.content || a.description,
+            targetAudience: a.targetAudience,
+            targetBranches: a.targetBranches || [],
+            isEdited: a.isEdited,
+            createdBy: a.createdBy,
+        };
+        setSelectedEvent(ev);
+        setSelectedIndex(newIndex);
+        setViewedIds(prev => new Set([...prev, a._id]));
+    };
+
+    const goToNextAnnouncement = () => {
+        if (selectedIndex === null || selectedIndex >= announcements.length - 1) return;
+        const newIndex = selectedIndex + 1;
+        const a = announcements[newIndex];
+        const eventDate = new Date(a.editedAt || a.createdAt);
+        const ev = {
+            id: a._id, title: a.title,
+            start: eventDate,
+            end: new Date(eventDate.getTime() + 60 * 60 * 1000),
+            type: a.type || 'announcement',
+            description: a.content || a.description,
+            targetAudience: a.targetAudience,
+            targetBranches: a.targetBranches || [],
+            isEdited: a.isEdited,
+            createdBy: a.createdBy,
+        };
+        setSelectedEvent(ev);
+        setSelectedIndex(newIndex);
+        setViewedIds(prev => new Set([...prev, a._id]));
     };
 
     const closeDetails = () => {
         setSelectedEvent(null);
+        setSelectedIndex(null);
     };
 
     return (
@@ -403,16 +451,43 @@ export default function StudentDashboard() {
 
                     {selectedEvent ? (
                         <>
-                            <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6 dark:border-slate-700">
-                                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 dark:text-slate-100">
-                                    <Briefcase className="text-indigo-500 dark:text-indigo-300" /> Event Details
+                            {/* Panel header ─ title left, nav pill + close right */}
+                            <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-5 dark:border-slate-700">
+                                <h2 className="text-base font-bold text-slate-800 flex items-center gap-2 dark:text-slate-100">
+                                    <Briefcase size={16} className="text-indigo-500 dark:text-indigo-300" /> Event Details
                                 </h2>
-                                <button
-                                    onClick={closeDetails}
-                                    className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-red-500 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-red-300"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    {/* Compact nav pill */}
+                                    {announcements.length > 1 && (
+                                        <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg px-1 py-0.5">
+                                            <button
+                                                onClick={goToNextAnnouncement}
+                                                disabled={selectedIndex === null || selectedIndex >= announcements.length - 1}
+                                                title="Older"
+                                                className="p-1 rounded transition-colors text-slate-500 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                            </button>
+
+                                            <button
+                                                onClick={goToPrevAnnouncement}
+                                                disabled={selectedIndex === null || selectedIndex <= 0}
+                                                title="Newer"
+                                                className="p-1 rounded transition-colors text-slate-500 hover:text-slate-900 hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                            </button>
+                                        </div>
+                                    )}
+                                    {/* Close */}
+                                    <button
+                                        onClick={closeDetails}
+                                        className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-red-500 dark:hover:bg-slate-800 dark:text-slate-500 dark:hover:text-red-300"
+                                        title="Close"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
@@ -421,9 +496,22 @@ export default function StudentDashboard() {
                                         {selectedEvent.type ? selectedEvent.type.replace('_', ' ') : 'Event'}
                                     </span>
                                     <h3 className="text-xl font-bold text-slate-900 mb-2 dark:text-slate-100">{selectedEvent.title}</h3>
-                                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 dark:text-slate-300">
-                                        <Clock size={14} className="text-slate-400 dark:text-slate-500" />
-                                        <span>{new Date(selectedEvent.start).toLocaleString()}</span>
+                                    <div className="flex flex-col gap-1 text-sm text-slate-500 mb-4 dark:text-slate-300">
+                                        <div className="flex items-center gap-2">
+                                            <Clock size={14} className="text-slate-400 dark:text-slate-500" />
+                                            <span>{new Date(selectedEvent.start).toLocaleString()}</span>
+                                            {selectedEvent.isEdited && (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                    Edited
+                                                </span>
+                                            )}
+                                        </div>
+                                        {selectedEvent.createdBy && (
+                                            <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                                                <span>By <span className="font-semibold text-slate-600 dark:text-slate-300">{selectedEvent.createdBy?.fullName || selectedEvent.createdBy?.email || 'Admin'}</span></span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -432,6 +520,29 @@ export default function StudentDashboard() {
                                     <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap dark:text-slate-300">
                                         {selectedEvent.description || selectedEvent.content || "No detailed description provided."}
                                     </p>
+                                </div>
+
+                                {/* Target metadata */}
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 dark:bg-slate-800/80 dark:border-slate-700 space-y-2">
+                                    <h4 className="font-semibold text-slate-800 text-sm mb-1 dark:text-slate-100">Broadcast To</h4>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Audience:</span>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                                            {selectedEvent.targetAudience === 'all' ? 'All Programs' : (selectedEvent.targetAudience || 'All Programs').toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-start gap-2 flex-wrap">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-0.5">Branches:</span>
+                                        {selectedEvent.targetBranches && selectedEvent.targetBranches.length > 0 ? (
+                                            <div className="flex flex-wrap gap-1">
+                                                {selectedEvent.targetBranches.map((b, i) => (
+                                                    <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">{b}</span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">All Branches</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </>
@@ -444,23 +555,34 @@ export default function StudentDashboard() {
                                 {announcements.length === 0 ? (
                                     <div className="text-center py-8 text-slate-400 font-medium text-sm dark:text-slate-500">No new announcements for your branch.</div>
                                 ) : (
-                                    announcements.map((a) => (
+                                    announcements.map((a, idx) => (
                                         <div
                                             key={a._id}
                                             onClick={() => handleSelectEvent({
                                                 id: a._id,
                                                 title: a.title,
-                                                start: new Date(a.createdAt),
-                                                end: new Date(new Date(a.createdAt).getTime() + 60 * 60 * 1000),
+                                                start: new Date(a.editedAt || a.createdAt),
+                                                end: new Date(new Date(a.editedAt || a.createdAt).getTime() + 60 * 60 * 1000),
                                                 type: a.type || 'announcement',
-                                                description: a.content || a.description
+                                                description: a.content || a.description,
+                                                targetAudience: a.targetAudience,
+                                                targetBranches: a.targetBranches || [],
+                                                isEdited: a.isEdited,
+                                                createdBy: a.createdBy,
                                             })}
                                             className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-100 transition-colors group cursor-pointer dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800 dark:hover:border-blue-800"
                                         >
                                             <div className="flex items-start justify-between mb-2">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-white border shadow-sm group-hover:border-blue-200 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:group-hover:border-blue-700">
-                                                    {a.type ? a.type.replace('_', ' ') : 'Announcement'}
-                                                </span>
+                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-white border shadow-sm group-hover:border-blue-200 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:group-hover:border-blue-700">
+                                                        {a.type ? a.type.replace('_', ' ') : 'Announcement'}
+                                                    </span>
+                                                    {a.isEdited && (
+                                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                            Edited
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <span className="text-xs text-slate-400 font-medium flex items-center gap-1 dark:text-slate-500"><Clock size={12} />{new Date(a.createdAt).toLocaleDateString()}</span>
                                             </div>
                                             <h3 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-blue-700 transition-colors dark:text-slate-100 dark:group-hover:text-blue-300">{a.title}</h3>

@@ -167,6 +167,11 @@ export default function StudentAnnouncements() {
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold border ${cfg.color}`}>
                                                 {cfg.label}
                                             </span>
+                                            {a.isEdited && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">
+                                                    Edited
+                                                </span>
+                                            )}
                                             {isViewed && !isExpanded && (
                                                 <span className="text-xs text-slate-400 font-medium">· Viewed</span>
                                             )}
@@ -199,6 +204,16 @@ export default function StudentAnnouncements() {
                                             <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap dark:text-slate-300">{body}</p>
                                         </div>
                                         <div className="mt-3 flex flex-wrap gap-3">
+                                            {/* Author */}
+                                            {a.createdBy && (
+                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 w-full">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                                                    <span>By <span className="font-semibold text-slate-700 dark:text-slate-200">{a.createdBy?.fullName || a.createdBy?.email || 'Admin'}</span></span>
+                                                    {a.isEdited && a.editedAt && (
+                                                        <span className="ml-2 text-amber-500 dark:text-amber-400">· edited {format(new Date(a.editedAt), 'dd MMM yyyy, hh:mm a')}</span>
+                                                    )}
+                                                </div>
+                                            )}
                                             {a.targetBranches?.length > 0 && (
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                     <span className="text-xs text-slate-400 font-semibold">Branches:</span>

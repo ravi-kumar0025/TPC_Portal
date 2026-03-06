@@ -151,7 +151,14 @@ exports.deleteEvent = async (req, res) => {
 
 exports.getAnnouncements = async (req, res) => {
     try {
-        const announcements = await Announcement.find().sort({ createdAt: -1 }).populate('createdBy', 'fullName email');
+        const raw = await Announcement.find()
+            .populate('createdBy', 'fullName email');
+        // Sort by effective date = max(editedAt, createdAt)
+        const announcements = raw.sort((a, b) => {
+            const aDate = Math.max(a.editedAt?.getTime() ?? 0, a.createdAt?.getTime() ?? 0);
+            const bDate = Math.max(b.editedAt?.getTime() ?? 0, b.createdAt?.getTime() ?? 0);
+            return bDate - aDate;
+        });
         res.status(200).json({ announcements });
     } catch (err) {
         res.status(500).json({ message: 'Internal server error' });
@@ -177,8 +184,21 @@ exports.createAnnouncement = async (req, res) => {
 exports.updateAnnouncement = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
-        const updatedAnnouncement = await Announcement.findByIdAndUpdate(id, updates, { new: true });
+        const { title, content, targetAudience, targetBranches } = req.body;
+        const now = new Date();
+
+        const updatedAnnouncement = await Announcement.findByIdAndUpdate(
+            id,
+            {
+                ...(title !== undefined && { title }),
+                ...(content !== undefined && { content }),
+                ...(targetAudience !== undefined && { targetAudience }),
+                ...(targetBranches !== undefined && { targetBranches }),
+                isEdited: true,
+                editedAt: now,
+            },
+            { new: true, runValidators: true }
+        );
         if (!updatedAnnouncement) {
             return res.status(404).json({ message: 'Announcement not found' });
         }
