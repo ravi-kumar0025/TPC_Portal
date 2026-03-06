@@ -104,7 +104,7 @@ exports.submitVerification = async (req, res) => {
         const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
             updateData,
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedStudent) {
@@ -161,7 +161,7 @@ exports.updateProfile = async (req, res) => {
         const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
             updateData,
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         res.status(200).json({

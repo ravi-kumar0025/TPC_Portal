@@ -267,11 +267,10 @@ export default function StudentCalendarUpdate() {
                     </div>
 
                     {message.text && (
-                        <div className={`p-3 rounded-lg text-sm font-bold shadow-inner flex items-center gap-2 border ${
-                            message.type === 'error'
+                        <div className={`p-3 rounded-lg text-sm font-bold shadow-inner flex items-center gap-2 border ${message.type === 'error'
                                 ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-900'
                                 : 'bg-green-50 text-green-700 border-green-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-900'
-                        }`}>
+                            }`}>
                             <div className={`w-2 h-2 rounded-full ${message.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`} />
                             {message.text}
                         </div>
@@ -316,11 +315,10 @@ export default function StudentCalendarUpdate() {
                             return (
                                 <div
                                     key={ev._id}
-                                    className={`p-5 border rounded-xl relative group flex flex-col transition-all ${
-                                        isPast
+                                    className={`p-5 border rounded-xl relative group flex flex-col transition-all ${isPast
                                             ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100'
                                             : 'bg-white dark:bg-slate-900 border-indigo-100 dark:border-indigo-900/40 shadow-sm hover:shadow-md'
-                                    }`}
+                                        }`}
                                 >
                                     <button
                                         onClick={() => handleDelete(ev._id)}

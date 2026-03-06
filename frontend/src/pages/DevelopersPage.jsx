@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
-import { Github, Linkedin } from 'lucide-react';
+import { Github, Linkedin, Twitter, ExternalLink, Menu, X, Home, Briefcase, Code, BarChart2, Phone, LayoutDashboard, LogOut } from 'lucide-react';
 import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../assets/logo.png';
+import { useAuth } from '../context/AuthContext';
 
 // Framer Motion Variants for Staggered Entrance
 const containerVariants = {
@@ -47,7 +48,7 @@ const DeveloperCard = ({ member, index }) => {
     const organicOffset = getOffset(index);
 
     return (
-        <MotionDiv variants={itemVariants} className={`w-full ${organicOffset}`}>
+        <MotionDiv variants={itemVariants} className={`w - full ${organicOffset} `}>
             <Tilt
                 tiltMaxAngleX={10}
                 tiltMaxAngleY={10}
@@ -112,6 +113,8 @@ const DeveloperCard = ({ member, index }) => {
 export default function DevelopersPage() {
     const [developers, setDevelopers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { token, logout } = useAuth();
 
     useEffect(() => {
         const fetchDevelopers = async () => {
@@ -141,33 +144,109 @@ export default function DevelopersPage() {
             {/* Navbar */}
             <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100 transition-all duration-300 dark:bg-slate-950/85 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
-                        <Link to="/" className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-white rounded-xl p-1.5 flex items-center justify-center shadow-sm ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-700">
+                    <div className="flex justify-between h-14 items-center">
+                        <Link to="/" className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-700">
                                 <img src={logo} alt="IIT Patna logo" className="w-full h-full object-contain" />
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-xl font-bold text-gray-900 tracking-tight dark:text-slate-100">Training &amp; Placement</span>
-                                <span className="text-sm font-medium text-blue-600">IIT Patna</span>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-lg font-bold text-gray-900 tracking-tight dark:text-slate-100 hidden lg:block whitespace-nowrap">Training & Placement</span>
+                                <span className="text-lg font-bold text-gray-900 tracking-tight dark:text-slate-100 lg:hidden">TPC</span>
+                                <span className="text-xs font-medium text-blue-600">IIT Patna</span>
                             </div>
                         </Link>
-                        <div className="hidden md:flex items-center space-x-8">
-                            <Link to="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Home</Link>
-                            <Link to="/developers" className="text-blue-600 font-medium transition-colors">Developers</Link>
-                            <Link to="/#stats" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Statistics</Link>
-                            <Link to="/#contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300">Contact</Link>
+                        <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                            <Link to="/" className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300 group" title="Home">
+                                <Home className="w-5 h-5 lg:hidden" />
+                                <span className="hidden lg:block">Home</span>
+                            </Link>
+                            <Link to="/past-recruiters" className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300 group" title="Past Recruiters">
+                                <Briefcase className="w-5 h-5 lg:hidden" />
+                                <span className="hidden lg:block">Past Recruiters</span>
+                            </Link>
+                            <Link to="/developers" className="flex items-center gap-1.5 text-blue-600 font-medium transition-colors group" title="Developers">
+                                <Code className="w-5 h-5 lg:hidden" />
+                                <span className="hidden lg:block">Developers</span>
+                            </Link>
+                            <Link to="/#stats" className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300 group" title="Statistics">
+                                <BarChart2 className="w-5 h-5 lg:hidden" />
+                                <span className="hidden lg:block">Statistics</span>
+                            </Link>
+                            <Link to="/#contact" className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 font-medium transition-colors dark:text-slate-300 group" title="Contact">
+                                <Phone className="w-5 h-5 lg:hidden" />
+                                <span className="hidden lg:block">Contact</span>
+                            </Link>
                             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
                             <ThemeToggle />
-                            <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">Log in</Link>
-                            <Link to="/login" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                                Portal Access
-                            </Link>
+                            {token ? (
+                                <div className="flex items-center space-x-2 lg:space-x-4">
+                                    <Link to="/dashboard" className="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-1.5" title="Dashboard">
+                                        <LayoutDashboard className="w-4 h-4 lg:hidden" />
+                                        <span className="hidden lg:block">Dashboard</span>
+                                    </Link>
+                                    <button
+                                        onClick={logout}
+                                        className="text-red-500 font-semibold hover:text-red-600 transition-colors p-2 lg:p-0 flex items-center gap-1.5"
+                                        title="Logout"
+                                    >
+                                        <LogOut className="w-5 h-5 lg:hidden" />
+                                        <span className="hidden lg:block">Logout</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center space-x-2 lg:space-x-4">
+                                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors px-2 lg:px-0 text-sm lg:text-base">Log in</Link>
+                                    <Link to="/login" className="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg font-medium text-sm lg:text-base hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                                        Portal Access
+                                    </Link>
+                                </div>
+                            )}
                         </div>
-                        <div className="md:hidden">
+                        <div className="md:hidden flex items-center gap-4">
                             <ThemeToggle />
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="text-gray-600 hover:text-blue-600 focus:outline-none dark:text-slate-300"
+                            >
+                                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Menu Dropdown */}
+                {isMobileMenuOpen && (
+                    <div className="md:hidden bg-white border-t border-gray-100 shadow-xl dark:bg-slate-950 dark:border-slate-800">
+                        <div className="px-4 pt-4 pb-6 space-y-4">
+                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600 hover:text-blue-600 font-medium dark:text-slate-300">Home</Link>
+                            <Link to="/past-recruiters" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600 hover:text-blue-600 font-medium dark:text-slate-300">Past Recruiters</Link>
+                            <Link to="/developers" onClick={() => setIsMobileMenuOpen(false)} className="block text-blue-600 font-medium">Developers</Link>
+                            <Link to="/#stats" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600 hover:text-blue-600 font-medium dark:text-slate-300">Statistics</Link>
+                            <Link to="/#contact" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600 hover:text-blue-600 font-medium dark:text-slate-300">Contact</Link>
+                            <div className="w-full h-px bg-gray-200 dark:bg-slate-800 my-4"></div>
+                            {token ? (
+                                <>
+                                    <Link to="/dashboard" className="block w-full text-center bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+                                        Go to Dashboard
+                                    </Link>
+                                    <button
+                                        onClick={logout}
+                                        className="block w-full text-center text-red-500 font-semibold hover:bg-red-50 px-6 py-3 rounded-lg transition-colors"
+                                    >
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="block text-blue-600 font-semibold mb-4 text-center">Log in</Link>
+                                    <Link to="/login" className="block w-full text-center bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+                                        Portal Access
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
             </nav>
 
             <div className="pt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

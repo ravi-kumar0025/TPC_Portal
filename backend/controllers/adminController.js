@@ -26,7 +26,7 @@ exports.verifyCompany = async (req, res) => {
         const company = await Company.findByIdAndUpdate(
             companyId,
             { verificationStatus: status },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!company) {
@@ -178,7 +178,7 @@ exports.updateAnnouncement = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
-        const updatedAnnouncement = await Announcement.findByIdAndUpdate(id, updates, { new: true });
+        const updatedAnnouncement = await Announcement.findByIdAndUpdate(id, updates, { returnDocument: 'after' });
         if (!updatedAnnouncement) {
             return res.status(404).json({ message: 'Announcement not found' });
         }
@@ -223,7 +223,7 @@ exports.verifyStudentData = async (req, res) => {
         const student = await Student.findByIdAndUpdate(
             studentId,
             { verificationStatus: status },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!student) {
@@ -262,7 +262,7 @@ exports.updateAdminRole = async (req, res) => {
         const updatedAdmin = await Admin.findByIdAndUpdate(
             adminId,
             adminUpdates,
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!updatedAdmin) {
