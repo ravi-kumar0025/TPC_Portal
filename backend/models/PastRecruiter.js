@@ -12,6 +12,11 @@ const pastRecruiterSchema = new mongoose.Schema({
         required: [true, 'Please provide the industry'],
         trim: true
     },
+    logoUrl: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     tier: {
         type: String,
         enum: ['Tier 1', 'Tier 2', 'Tier 3'],

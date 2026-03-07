@@ -62,9 +62,9 @@ const DeveloperCard = ({ member, index }) => {
                 glarePosition="bottom"
                 className="w-full rounded-[2rem]"
             >
-                <div className="moving-border-card relative w-full min-h-[360px] rounded-[2rem] p-[2px] overflow-hidden group shadow-[0_0_36px_-16px_rgba(14,165,233,0.45)] dark:shadow-[0_0_44px_-16px_rgba(34,211,238,0.6)]">
+                <div className="relative w-full min-h-[360px] rounded-[2rem] overflow-hidden group border border-slate-200 border-t-[4px] border-t-sky-500 bg-[#F3F4F6] shadow-[0_16px_32px_-22px_rgba(15,23,42,0.38)] dark:bg-slate-900 dark:border-slate-700 dark:border-t-cyan-400">
                     <div
-                        className="relative w-full min-h-[356px] flex flex-col items-center px-5 py-8 pb-20 rounded-[1.9rem] bg-white/95 border border-blue-100 shadow-[0_20px_54px_-22px_rgba(14,165,233,0.48)] hover:shadow-[0_24px_62px_-20px_rgba(14,165,233,0.56)] transition-all duration-500 overflow-hidden dark:bg-slate-900/95 dark:border-cyan-900/80 dark:shadow-[0_22px_58px_-22px_rgba(34,211,238,0.2)] dark:hover:shadow-[0_28px_66px_-20px_rgba(34,211,238,0.3)]"
+                        className="relative w-full min-h-[356px] flex flex-col items-center px-5 py-8 pb-20 rounded-[1.9rem] bg-transparent border-0 shadow-none transition-all duration-500 overflow-hidden"
                     >
                         {/* Profile Image */}
                         <div className="relative w-28 h-28 mb-5 z-10">
