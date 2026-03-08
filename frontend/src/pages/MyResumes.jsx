@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FileText, UploadCloud, Loader2, ExternalLink, ShieldAlert, CheckCircle2, ChevronRight, Trash2, AlertTriangle } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 export default function MyResumes() {
     const { user, token } = useAuth();
@@ -14,7 +15,7 @@ export default function MyResumes() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/auth/me', {
+                const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -52,7 +53,7 @@ export default function MyResumes() {
             const formData = new FormData();
             formData.append('resume', resumeFile);
 
-            const res = await fetch('http://localhost:5000/api/student/profile', {
+            const res = await fetch(`${API_BASE_URL}/api/student/profile`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -90,7 +91,7 @@ export default function MyResumes() {
             const formData = new FormData();
             formData.append('removeResume', 'true');
 
-            const res = await fetch('http://localhost:5000/api/student/profile', {
+            const res = await fetch(`${API_BASE_URL}/api/student/profile`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`

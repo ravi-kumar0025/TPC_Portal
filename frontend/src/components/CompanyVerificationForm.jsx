@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { CheckCircle, Clock, XCircle, Building2 } from 'lucide-react';
 
@@ -44,7 +44,7 @@ export default function CompanyVerificationForm() {
         setError(null);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/company/verify', formData, {
+            const res = await api.post('/api/company/verify', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }

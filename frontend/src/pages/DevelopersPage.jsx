@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import { Github, Linkedin, LayoutDashboard, Home, Briefcase, Code, BarChart2, Phone, Menu, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../assets/logo.png';
 import { useAuth } from '../context/AuthContext';
@@ -119,7 +119,7 @@ export default function DevelopersPage() {
     useEffect(() => {
         const fetchDevelopers = async () => {
             try {
-                const response = await axios.get('/api/developers');
+                const response = await api.get('/api/developers');
                 setDevelopers(response.data);
             } catch (error) {
                 console.error('Failed to fetch developers:', error);

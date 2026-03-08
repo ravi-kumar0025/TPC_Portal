@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import {
     Calendar as CalendarIcon,
@@ -158,7 +158,7 @@ export default function StudentCalendarUpdate() {
                 links,
                 companyEmail: editForm.companyEmail.trim() || undefined,
             };
-            await axios.put(`http://localhost:5000/api/admin/events/${editingEvent._id}`, payload, {
+            await api.put(`/api/admin/events/${editingEvent._id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             closeEdit();
@@ -185,7 +185,7 @@ export default function StudentCalendarUpdate() {
     const fetchEvents = useCallback(async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/admin/events', {
+            const { data } = await api.get('/api/admin/events', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEvents(data.events || []);
@@ -237,7 +237,7 @@ export default function StudentCalendarUpdate() {
                 companyEmail: formData.companyEmail.trim() || undefined,
             };
 
-            await axios.post('http://localhost:5000/api/admin/events', payload, {
+            await api.post('/api/admin/events', payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -257,7 +257,7 @@ export default function StudentCalendarUpdate() {
         if (!ok) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/admin/events/${id}`, {
+            await api.delete(`/api/admin/events/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchEvents();

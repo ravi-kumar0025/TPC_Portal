@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Bell, Send, Trash2, Pencil, X, Clock, Search, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 
@@ -108,7 +108,7 @@ export default function ManageAnnouncements() {
 
     const fetchAnnouncements = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/admin/announcements', {
+            const { data } = await api.get('/api/admin/announcements', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAnnouncements(data.announcements);
@@ -127,7 +127,7 @@ export default function ManageAnnouncements() {
                 targetBranches: formData.targetBranches,
                 targetYears: formData.targetYears,
             };
-            await axios.post('http://localhost:5000/api/admin/announcements', payload, {
+            await api.post('/api/admin/announcements', payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage('Announcement posted successfully!');
@@ -141,7 +141,7 @@ export default function ManageAnnouncements() {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this announcement?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/announcements/${id}`, {
+            await api.delete(`/api/admin/announcements/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchAnnouncements();
@@ -180,7 +180,7 @@ export default function ManageAnnouncements() {
                 targetBranches: editForm.targetBranches,
                 targetYears: editForm.targetYears,
             };
-            await axios.put(`http://localhost:5000/api/admin/announcements/${editingAnn._id}`, payload, {
+            await api.put(`/api/admin/announcements/${editingAnn._id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setEditMessage('Announcement updated!');

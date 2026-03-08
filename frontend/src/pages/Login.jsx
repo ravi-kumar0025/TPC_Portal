@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Mail, KeyRound, ChevronRight, Loader2, House } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
@@ -28,7 +28,7 @@ export default function Login() {
         setError('');
 
         try {
-            await axios.post('http://localhost:5000/api/auth/login', { email, role });
+            await api.post('/api/auth/login', { email, role });
             setOtpSent(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
@@ -42,7 +42,7 @@ export default function Login() {
         setLoading(true);
         setError('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/verify-otp', { email, otp });
+            const { data } = await api.post('/api/auth/verify-otp', { email, otp });
             login(data.token, data.user);
             navigate('/dashboard/' + data.user.role);
         } catch (err) {

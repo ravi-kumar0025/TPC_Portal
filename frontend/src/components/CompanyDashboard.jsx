@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import {
     Search,
@@ -176,7 +176,7 @@ export default function CompanyDashboard() {
     const fetchCompanyEvents = useCallback(async () => {
         setEventsLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/company/events', {
+            const { data } = await api.get('/api/company/events', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setCompanyEvents(data.events || []);
@@ -190,7 +190,7 @@ export default function CompanyDashboard() {
     const fetchStudents = useCallback(async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/company/students', {
+            const { data } = await api.get('/api/company/students', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: {
                     cgpa: cgpa || undefined,

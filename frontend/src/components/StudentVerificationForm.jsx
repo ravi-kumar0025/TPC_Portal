@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { CheckCircle, Clock, XCircle, UploadCloud, FileText } from 'lucide-react';
 
@@ -62,7 +62,7 @@ export default function StudentVerificationForm() {
         data.append('idCard', idCard);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/student/verify', data, {
+            const res = await api.post('/api/student/verify', data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

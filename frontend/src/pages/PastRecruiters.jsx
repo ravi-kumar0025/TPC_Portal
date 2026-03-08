@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Menu, X, Home, Briefcase, Code, BarChart2, Phone, LayoutDashboard, LogOut, Settings } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../assets/logo.png';
@@ -132,7 +132,7 @@ export default function PastRecruiters() {
     useEffect(() => {
         const fetchRecruiters = async () => {
             try {
-                const response = await axios.get('/api/past-recruiters');
+                const response = await api.get('/api/past-recruiters');
                 setRecruiters(response.data.data || []);
             } catch (err) {
                 console.error("Failed to fetch recruiters:", err);
@@ -167,7 +167,7 @@ export default function PastRecruiters() {
         if (window.confirm('Are you sure you want to remove this recruiter?')) {
             const recruiterToDelete = recruiters[indexToDelete];
             try {
-                await axios.delete(`/api/past-recruiters/${recruiterToDelete._id}`, {
+                await api.delete(`/api/past-recruiters/${recruiterToDelete._id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const newRecruiters = recruiters.filter((_, idx) => idx !== indexToDelete);
@@ -246,7 +246,7 @@ export default function PastRecruiters() {
 
             if (editIndex !== null && editIndex !== -1 && editId) {
                 // Update existing
-                const response = await axios.put(`/api/past-recruiters/${editId}`, formData, {
+                const response = await api.put(`/api/past-recruiters/${editId}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const newRecruiters = [...recruiters];
@@ -254,7 +254,7 @@ export default function PastRecruiters() {
                 setRecruiters(newRecruiters);
             } else {
                 // Add new
-                const response = await axios.post('/api/past-recruiters', formData, {
+                const response = await api.post('/api/past-recruiters', formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setRecruiters([response.data.data, ...recruiters]);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { FileSignature, AlertTriangle, UserPlus } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export default function AdminPowerAssignment() {
                 email: AssignForm.email,
                 newAdminType: AssignForm.adminType
             };
-            const { data } = await axios.post('http://localhost:5000/api/admin/assign-power', payload, {
+            const { data } = await api.post('/api/admin/assign-power', payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage(data.message);
