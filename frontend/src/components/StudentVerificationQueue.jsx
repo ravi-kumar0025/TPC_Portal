@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Check, X, FileText, User } from 'lucide-react';
 
@@ -16,7 +16,7 @@ export default function StudentVerificationQueue() {
     const fetchPendingStudents = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get('http://localhost:5000/api/admin/students/pending', {
+            const { data } = await api.get('/api/admin/students/pending', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPendingStudents(data.pendingStudents);
@@ -32,7 +32,7 @@ export default function StudentVerificationQueue() {
 
     const handleVerification = async (studentId, status) => {
         try {
-            await axios.put(`http://localhost:5000/api/admin/students/${studentId}/verify`, { status }, {
+            await api.put(`/api/admin/students/${studentId}/verify`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

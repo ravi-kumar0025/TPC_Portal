@@ -1,51 +1,150 @@
-# IIT Patna Training and Placement Cell (TPC) Portal
+# IIT Patna Training & Placement Cell (TPC) Portal
+
+<div align="center">
+
+### 🌐 Live at **[tpc-pwj4.onrender.com](https://tpc-pwj4.onrender.com)**
+
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=white)
+
+</div>
+
+---
 
 ## Overview
-The official Training and Placement Committee (TPC) portal for the Indian Institute of Technology (IIT) Patna. This platform is designed to seamlessly connect Students, Companies, and TPC Admins. It aims to streamline the recruitment process for companies and students by providing a centralized hub for events, internships, and placement drives.
+
+The official Training and Placement Committee (TPC) portal for **IIT Patna**. A full-stack web application that connects **Students**, **Companies**, and **TPC Admins** — streamlining the recruitment lifecycle from announcement to placement.
 
 ## Key Features
-- **Student Portal:** Centralized dashboard for accessing announcements, calendar events (internships, placement drives), updating user profiles, and viewing related opportunities.
-- **Company Portal:** Advanced filtering and search of the student database to recruit top talent easily. 
-- **Admin Dashboard:** Role-based access control (Super Admin, Announcement Admin, Student Admin) to manage users, verify companies, and oversee announcements and activities.
-- **Passwordless Authentication:** Secure OTP-based login via email for all user roles.
+
+| Role | Capabilities |
+|------|-------------|
+| **Students** | Dashboard with event calendar, announcements filtered by branch & program, resume management, profile editing, ID-card verification, and one-click event application tracking |
+| **Companies** | Verification workflow, advanced student database search & filtering (CGPA, branch, graduation year), event-wise applicant view, and student profile access |
+| **Admins** | Multi-tier RBAC (Super Admin / Announcement Admin / Student Admin), event & announcement CRUD, student & company verification queues, admin power assignment, and past recruiter management |
+| **Public** | Landing page with placement statistics & charts, past recruiters showcase, and developers page |
+
+### Additional Highlights
+- 🔐 **Passwordless Auth** — OTP-based email login (no passwords to remember)
+- 🌙 **Dark Mode** — Full dark theme support across all pages
+- 📅 **Interactive Calendar** — Color-coded multi-day events with ±2 month navigation
+- 📄 **Resume Builder** — Upload, manage, and generate PDF resumes
+- ☁️ **Cloud Storage** — Cloudinary-backed image/file uploads (logos, ID cards, resumes)
 
 ## Tech Stack
+
 ### Frontend
-- **Framework:** React.js powered by Vite
-- **Styling:** Tailwind CSS & Framer Motion (for animations)
-- **Data Visualization:** Recharts
-- **Calendar Handling:** React Big Calendar 
-- **Routing:** React Router DOM
+| Technology | Purpose |
+|------------|---------|
+| React 18 + Vite | App framework & dev server |
+| Tailwind CSS | Utility-first styling |
+| Framer Motion | Animations & transitions |
+| React Big Calendar | Event calendar views |
+| Recharts | Placement statistics charts |
+| Axios | HTTP client (centralized via `api.js`) |
+| React Router DOM | Client-side routing |
+| React Parallax Tilt | 3D card effects |
+| Lucide React | Icon library |
 
 ### Backend
-- **Framework:** Node.js, Express.js
-- **Database:** MongoDB configured with Mongoose ODM
-- **Authentication:** JWT (JSON Web Tokens) and bcryptjs
-- **Storage:** Cloudinary plugin for file and image management
-- **Email Delivery:** Nodemailer
+| Technology | Purpose |
+|------------|---------|
+| Node.js + Express 5 | REST API server |
+| MongoDB + Mongoose 9 | Database & ODM |
+| JWT + bcryptjs | Authentication & hashing |
+| Cloudinary + Multer | File/image uploads & storage |
+| Nodemailer | OTP email delivery |
+| CORS | Cross-origin security |
 
 ## Project Structure
-```text
+
+```
 TPC/
-├── backend/            # Express.js REST API
-│   ├── models/         # Mongoose schemas (User, Student, Company, Admin, Event, OTP)
-│   ├── routes/         # API endpoints
-│   ├── controllers/    # Business logic for routes
-│   └── middleware/     # JWT and Role-Based Access Control logic
-├── frontend/           # React.js web application
+├── backend/
+│   ├── controllers/        # Business logic
+│   │   ├── adminController.js
+│   │   ├── authController.js
+│   │   ├── calendarController.js
+│   │   ├── companyController.js
+│   │   ├── eventController.js
+│   │   ├── pastRecruiterController.js
+│   │   └── studentController.js
+│   ├── models/             # Mongoose schemas
+│   │   ├── User.js, Student.js, Company.js, Admin.js
+│   │   ├── Event.js, Announcement.js, Otp.js
+│   │   ├── PastRecruiter.js, Developer.js
+│   │   └── HomePageStats.js
+│   ├── routes/             # API endpoints
+│   │   ├── authRoutes.js, adminRoutes.js
+│   │   ├── studentRoutes.js, companyRoutes.js
+│   │   ├── eventRoutes.js, pastRecruiterRoutes.js
+│   │   └── developerRoutes.js
+│   ├── middleware/         # JWT & RBAC middleware
+│   ├── utils/              # Email & Cloudinary helpers
+│   └── server.js           # Express app entry point
+│
+├── frontend/
 │   ├── src/
-│   │   ├── components/ # Reusable UI components
-│   │   ├── pages/      # Route pages (Dashboard, Landing, Calendar, etc.)
-│   │   └── assets/     # Static file assets
+│   │   ├── api.js           # Centralized Axios instance
+│   │   ├── context/         # AuthContext (global auth state)
+│   │   ├── pages/           # Route-level pages
+│   │   │   ├── LandingPage.jsx
+│   │   │   ├── Login.jsx, Signup.jsx
+│   │   │   ├── EditProfile.jsx, MyResumes.jsx
+│   │   │   ├── PastRecruiters.jsx
+│   │   │   └── DevelopersPage.jsx
+│   │   ├── components/      # Reusable UI components
+│   │   │   ├── DashboardShell.jsx
+│   │   │   ├── StudentDashboard.jsx, StudentCalendar.jsx
+│   │   │   ├── StudentAnnouncements.jsx
+│   │   │   ├── CompanyDashboard.jsx
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── ManageAnnouncements.jsx
+│   │   │   ├── StudentCalendarUpdate.jsx
+│   │   │   ├── Student/CompanyVerificationQueue.jsx
+│   │   │   ├── Student/CompanyVerificationForm.jsx
+│   │   │   └── ...more
+│   │   ├── hooks/           # Custom React hooks
+│   │   └── assets/          # Images & static files
+│   ├── .env.production      # Production API URL
+│   └── vite.config.js
+│
 └── README.md
 ```
 
-## Getting Started
+## Deployment
+
+The application is deployed on **[Render](https://render.com)** as two separate services:
+
+| Service | URL | Type |
+|---------|-----|------|
+| **Frontend** | [tpc-pwj4.onrender.com](https://tpc-pwj4.onrender.com) | Static Site |
+| **Backend** | [tpc-backend-kyem.onrender.com](https://tpc-backend-kyem.onrender.com) | Web Service |
+
+### Render Configuration
+
+**Frontend (Static Site):**
+- Root Directory: `TPC/frontend`
+- Build Command: `npm install && npm run build`
+- Publish Directory: `dist`
+
+**Backend (Web Service):**
+- Root Directory: `TPC/backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+
+> **Note:** Render free-tier services spin down after 15 minutes of inactivity. The first request may take 30–60 seconds to cold-start.
+
+## Getting Started (Local Development)
 
 ### Prerequisites
-- Node.js (v18 or higher recommended)
-- MongoDB instance (Atlas or local)
-- Cloudinary account (for media storage)
+- **Node.js** v18 or higher
+- **MongoDB** instance (Atlas or local)
+- **Cloudinary** account (for media storage)
 
 ### Installation
 
@@ -60,7 +159,7 @@ TPC/
    cd backend
    npm install
    ```
-   *Create a `.env` file in the `backend` directory with the following keys:*
+   Create a `.env` file in `backend/`:
    ```env
    PORT=5000
    MONGO_URI=your_mongodb_connection_string
@@ -71,7 +170,7 @@ TPC/
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
    ```
-   *Start the backend server:*
+   Start the backend:
    ```bash
    npm run dev
    ```
@@ -81,20 +180,48 @@ TPC/
    cd ../frontend
    npm install
    ```
-   *Create a `.env` file in the `frontend` directory with the following keys:*
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-   *Start the frontend development server:*
+   Start the frontend:
    ```bash
    npm run dev
    ```
+   The Vite dev server proxies `/api` requests to `http://localhost:5000` automatically.
+
+### Environment Variables
+
+| Variable | Location | Purpose |
+|----------|----------|---------|
+| `PORT` | Backend `.env` | Server port (default: 5000) |
+| `MONGO_URI` | Backend `.env` | MongoDB connection string |
+| `JWT_SECRET` | Backend `.env` | Token signing secret |
+| `EMAIL_USER` | Backend `.env` | SMTP email for OTPs |
+| `EMAIL_PASS` | Backend `.env` | SMTP password / app password |
+| `CLOUDINARY_CLOUD_NAME` | Backend `.env` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Backend `.env` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Backend `.env` | Cloudinary API secret |
+| `VITE_API_URL` | Frontend `.env.production` | Production backend URL |
+
+## API Architecture
+
+All API routes are prefixed with `/api`:
+
+| Prefix | Description |
+|--------|-------------|
+| `/api/auth` | Login, signup, OTP verification |
+| `/api/student` | Student profile, announcements, calendar, verification, resume |
+| `/api/company` | Company verification, student search, event applicants |
+| `/api/admin` | User management, events CRUD, announcements CRUD, verification queues, power assignment |
+| `/api/events` | Public event listing & student application |
+| `/api/past-recruiters` | Past recruiter CRUD (public read, admin write) |
+| `/api/developers` | Developer team info |
 
 ## Authorization & Security
-This application implements rigorous Route Protection and Role-Based Access Control (RBAC). 
-- Companies are subjected to an approval workflow before accessing the Student Database. 
-- Admins possess hierarchical permissions determining what data and actions they can access.
-- Confidential functionality is completely hidden or disabled for unauthorized users.
+
+- **JWT Authentication** — All protected routes require a valid Bearer token
+- **Role-Based Access Control (RBAC)** — Super Admin, Announcement Admin, Student Admin, Student, Company
+- **Company Approval Workflow** — Companies must be verified before accessing the student database
+- **Student Verification** — Students upload institute ID cards, reviewed and approved by admins
+- **CORS Protection** — Backend only accepts requests from the deployed frontend and localhost
 
 ## Acknowledgements
-Designed and implemented for the Training and Placement Cell, IIT Patna.
+
+Designed and developed for the **Training and Placement Cell, IIT Patna**.

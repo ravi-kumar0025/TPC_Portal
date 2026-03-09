@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, X, Check, Building2, User, Globe, Mail, Phone } from 'lucide-react';
 
@@ -18,7 +18,7 @@ export default function CompanyVerificationQueue() {
     const fetchPendingCompanies = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/admin/companies/pending', {
+            const { data } = await api.get('/api/admin/companies/pending', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPendingCompanies(data.companies);
@@ -34,7 +34,7 @@ export default function CompanyVerificationQueue() {
 
     const handleVerification = async (companyId, status) => {
         try {
-            await axios.put(`http://localhost:5000/api/admin/companies/${companyId}/verify`, { status }, {
+            await api.put(`/api/admin/companies/${companyId}/verify`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldAlert, Save, Loader2, UploadCloud } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 export default function EditProfile() {
     const { user, token } = useAuth();
@@ -17,7 +18,7 @@ export default function EditProfile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/auth/me', {
+                const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -75,7 +76,7 @@ export default function EditProfile() {
             let headers = { Authorization: `Bearer ${token}` };
 
             if (user.role === 'student') {
-                endpoint = 'http://localhost:5000/api/student/profile';
+                endpoint = `${API_BASE_URL}/api/student/profile`;
                 // Use FormData due to file upload possibility
                 const fd = new FormData();
                 if (formData.phoneNumber) fd.append('phoneNumber', formData.phoneNumber);
@@ -83,7 +84,7 @@ export default function EditProfile() {
                 if (resumeFile) fd.append('resume', resumeFile);
                 bodyData = fd;
             } else if (user.role === 'company') {
-                endpoint = 'http://localhost:5000/api/company/profile';
+                endpoint = `${API_BASE_URL}/api/company/profile`;
                 headers['Content-Type'] = 'application/json';
                 bodyData = JSON.stringify({
                     companyWebsite: formData.companyWebsite,

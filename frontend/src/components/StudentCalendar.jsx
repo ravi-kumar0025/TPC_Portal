@@ -11,7 +11,7 @@ import {
     X, Briefcase, Megaphone, MonitorPlay,
     Calendar as CalendarIcon, CheckCircle2, ExternalLink, Clock, MapPin, Loader2, AlertTriangle
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 const locales = { 'en-US': enUS };
@@ -106,7 +106,7 @@ const StudentCalendar = () => {
         try {
             if (!authToken) throw new Error('No authentication token found');
 
-            const response = await axios.get('http://localhost:5000/api/student/calendar', {
+            const response = await api.get('/api/student/calendar', {
                 headers: { Authorization: `Bearer ${authToken}` }
             });
 
@@ -168,8 +168,8 @@ const StudentCalendar = () => {
     const handleApply = async (eventId) => {
         try {
             setApplyingId(eventId);
-            const response = await axios.patch(
-                `http://localhost:5000/api/events/${eventId}/apply`,
+            const response = await api.patch(
+                `/api/events/${eventId}/apply`,
                 {},
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );

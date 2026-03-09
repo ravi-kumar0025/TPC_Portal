@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Megaphone, Clock, ChevronDown, ChevronUp, Bell, Search, BookOpen, Briefcase, MonitorPlay, AlertCircle, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
@@ -49,8 +49,8 @@ export default function StudentAnnouncements() {
             if (department) params.append('branch', department);
             if (program) params.append('program', program);
 
-            const { data } = await axios.get(
-                `http://localhost:5000/api/student/announcements?${params.toString()}`,
+            const { data } = await api.get(
+                `/api/student/announcements?${params.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setAnnouncements(data.announcements);

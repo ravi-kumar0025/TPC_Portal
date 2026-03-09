@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Calendar as BigCalendar, dateFnsLocalizer } from 'react-big-calendar';
 
@@ -63,7 +63,7 @@ export default function StudentDashboard() {
 
     const fetchEvents = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/student/events', {
+            const { data } = await api.get('/api/student/events', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -82,8 +82,8 @@ export default function StudentDashboard() {
     const fetchAnnouncements = async () => {
         try {
             // Fetch all announcements — no filtering on the client
-            const { data } = await axios.get(
-                'http://localhost:5000/api/student/announcements',
+            const { data } = await api.get(
+                '/api/student/announcements',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setAnnouncements(data.announcements);
