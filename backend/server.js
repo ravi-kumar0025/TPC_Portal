@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://tpc-portal.vercel.app/',
+        'https://tpc-portal.vercel.app',
     ],
     credentials: true,
 }));
