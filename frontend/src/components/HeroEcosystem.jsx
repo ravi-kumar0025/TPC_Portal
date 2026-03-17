@@ -27,7 +27,7 @@ export default function HeroEcosystem({ user }) {
 
                 {/* Ecosystem Visualization */}
                 <div className="relative flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-8 mb-20 mt-12 animate-[fade-in-up_1.2s_ease-out_both] animation-delay-200">
-                    
+
                     {/* SVG Connecting Lines (Visible only on LG+) */}
                     <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[200px] hidden lg:block pointer-events-none z-0" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                         {/* Left to Center paths */}
@@ -89,7 +89,7 @@ export default function HeroEcosystem({ user }) {
 
                     {/* Center Column: Hub */}
                     <div className="relative w-full max-w-[340px] lg:w-[320px] h-[340px] lg:h-[320px] flex items-center justify-center z-10 shrink-0 mx-auto">
-                        
+
                         {/* Custom Animation Styles */}
                         <style>{`
                             @keyframes float-slow {
@@ -107,7 +107,7 @@ export default function HeroEcosystem({ user }) {
                                 animation: float-slow-delayed 5s ease-in-out infinite;
                             }
                         `}</style>
-                        
+
                         {/* Glowing Connectors */}
                         <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none stroke-blue-500/30 dark:stroke-blue-400/30 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" overflow="visible">
                             {/* Top Left -> Center */}
@@ -125,18 +125,18 @@ export default function HeroEcosystem({ user }) {
 
                         {/* Main Hub Glowing Hexagon-ish (rotated square) */}
                         <div className="absolute z-20 m-auto w-[130px] h-[130px] bg-gradient-to-br from-blue-600 to-cyan-400 dark:from-slate-700 dark:to-slate-800 rounded-3xl rotate-45 flex items-center justify-center shadow-[0_0_80px_rgba(59,130,246,0.6)] dark:shadow-[0_0_80px_rgba(59,130,246,0.25)] overflow-hidden border-2 border-white/20 dark:border-slate-600/50 backdrop-blur-sm transition-transform hover:scale-105 duration-500">
-                             {/* Dark theme explicit orange/blue glow overlay within hub */}
-                             <div className="absolute inset-0 bg-blue-500/10 dark:bg-cyan-500/20 mix-blend-overlay"></div>
-                             {/* Glass reflection overlay */}
-                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-white/5 -translate-x-1/2 -rotate-45"></div>
-                             
+                            {/* Dark theme explicit orange/blue glow overlay within hub */}
+                            <div className="absolute inset-0 bg-blue-500/10 dark:bg-cyan-500/20 mix-blend-overlay"></div>
+                            {/* Glass reflection overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-white/5 -translate-x-1/2 -rotate-45"></div>
+
                             <div className="-rotate-45 flex flex-col items-center">
                                 <div className="w-12 h-10 flex items-center justify-center mb-1 drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">
                                     <GraduationCap className="text-white w-9 h-9" strokeWidth={1.5} />
                                 </div>
-                                <span className="text-white font-bold text-[12px] text-center leading-tight tracking-wide drop-shadow-md">Placement<br/>Hub</span>
+                                <span className="text-white font-bold text-[12px] text-center leading-tight tracking-wide drop-shadow-md">Placement<br />Hub</span>
                             </div>
-                            
+
                             {/* Inner glow border imitation */}
                             <div className="absolute inset-1 rounded-[20px] border border-white/30 dark:border-blue-400/50 pointer-events-none"></div>
                         </div>
@@ -149,7 +149,7 @@ export default function HeroEcosystem({ user }) {
                             </div>
                             <span className="text-[10px] font-bold text-gray-700 dark:text-gray-200 text-center uppercase tracking-wider">Profile Verif.</span>
                         </div>
-                        
+
                         {/* Node 2: Top Right */}
                         <div className="absolute top-0 right-0 translate-x-2 -translate-y-2 lg:translate-x-6 lg:-translate-y-6 bg-white/95 dark:bg-[#1A2235]/95 backdrop-blur-sm p-3 rounded-2xl shadow-[0_10px_30px_rgba(20,184,166,0.15)] dark:shadow-[0_0_25px_rgba(20,184,166,0.15)] border border-teal-100/50 dark:border-teal-900/50 flex flex-col items-center justify-center gap-1.5 w-[94px] h-[94px] z-30 animate-float-delayed group cursor-default">
                             <div className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-800/60 shadow-inner">
@@ -182,7 +182,7 @@ export default function HeroEcosystem({ user }) {
                                 Multi-day Visual Calendar <Clock size={16} className="text-gray-500" />
                             </h3>
                         </div>
-                        
+
                         {/* Fake Calendar UI */}
                         <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/60 overflow-hidden text-[11px] text-gray-500 dark:text-gray-400 mb-6 lg:mb-8 font-medium">
                             <div className="flex justify-between px-3 py-2 border-b border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-800/80 text-gray-700 dark:text-gray-300">
@@ -200,10 +200,10 @@ export default function HeroEcosystem({ user }) {
                             </div>
                             <div className="flex flex-col bg-white dark:bg-slate-800/50">
                                 <div className="flex relative h-8 border-b border-gray-100 dark:border-slate-700/40">
-                                  <div className="absolute left-[14%] top-1 bottom-1 w-[57%] bg-green-100 dark:bg-green-900/30 border-l-[3px] border-green-500 rounded-r text-[10px] px-2 text-green-700 dark:text-green-300 flex items-center font-medium shadow-sm truncate backdrop-blur-sm">Day 1: JO Uploads (Company Y)</div>
+                                    <div className="absolute left-[14%] top-1 bottom-1 w-[57%] bg-green-100 dark:bg-green-900/30 border-l-[3px] border-green-500 rounded-r text-[10px] px-2 text-green-700 dark:text-green-300 flex items-center font-medium shadow-sm truncate backdrop-blur-sm">Day 1: JO Uploads (Company Y)</div>
                                 </div>
                                 <div className="flex relative h-8">
-                                  <div className="absolute left-[14%] top-1 bottom-1 w-[80%] bg-blue-100 dark:bg-blue-900/30 border-l-[3px] border-blue-500 rounded-r text-[10px] px-2 text-blue-700 dark:text-blue-300 flex items-center font-medium shadow-sm truncate backdrop-blur-sm">Day 2: TPC Announcements Sync</div>
+                                    <div className="absolute left-[14%] top-1 bottom-1 w-[80%] bg-blue-100 dark:bg-blue-900/30 border-l-[3px] border-blue-500 rounded-r text-[10px] px-2 text-blue-700 dark:text-blue-300 flex items-center font-medium shadow-sm truncate backdrop-blur-sm">Day 2: TPC Announcements Sync</div>
                                 </div>
                             </div>
                         </div>
@@ -255,7 +255,7 @@ export default function HeroEcosystem({ user }) {
                             <Link to="/login" className="w-full sm:w-auto min-w-[240px] bg-[#111827] hover:bg-black dark:bg-[#0891B2] dark:hover:bg-cyan-500 text-white px-8 py-4 rounded-full font-semibold text-[17px] shadow-lg dark:shadow-cyan-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 group">
                                 Login as Student
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">
-                                    <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </Link>
                         </>
