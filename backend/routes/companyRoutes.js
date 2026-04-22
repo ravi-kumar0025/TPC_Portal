@@ -10,4 +10,8 @@ router.get('/events', verifyToken, requireRole(['company']), companyController.g
 router.post('/verify', verifyToken, requireRole(['company']), companyController.submitVerification);
 router.put('/profile', verifyToken, requireRole(['company']), companyController.updateProfile);
 
+// New Event Workflow Routes
+router.post('/events/request', verifyToken, requireRole(['company']), isCompanyVerified, companyController.requestEvent);
+router.put('/events/:id/action', verifyToken, requireRole(['company']), isCompanyVerified, companyController.eventAction);
+
 module.exports = router;
