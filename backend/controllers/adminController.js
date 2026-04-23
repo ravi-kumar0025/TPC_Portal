@@ -340,6 +340,37 @@ exports.updateAdminRole = async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
+exports.updateProfile = async (req, res) => {
+    try {
+        const adminId = req.user.userId;
+        const updateData = {};
+
+        if (req.file && req.file.path) {
+            const { uploadOnCloudinary } = require('../utils/cloudinaryConfig');
+            const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+
+            if (cloudinaryResponse) {
+                updateData.profilePicture = cloudinaryResponse.url;
+            } else {
+                return res.status(500).json({ message: 'Error uploading profile picture to Cloudinary.' });
+            }
+        }
+
+        if (Object.keys(updateData).length > 0) {
+            const updatedAdmin = await Admin.findByIdAndUpdate(
+                adminId,
+                updateData,
+                { returnDocument: 'after' }
+            );
+            return res.status(200).json({ message: 'Profile updated successfully.', admin: updatedAdmin });
+        }
+
+        res.status(200).json({ message: 'No changes provided.', admin: await Admin.findById(adminId) });
+    } catch (err) {
+        console.error('updateProfile Error:', err);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};
 
 // New Event Workflow for Admins
 
@@ -357,15 +388,15 @@ exports.allotEventTiming = async (req, res) => {
     try {
         const { id } = req.params;
         const { startDate, endDate, deadline, adminNotes } = req.body;
-        
+
         if (!startDate) return res.status(400).json({ message: 'startDate is required' });
-        
+
         const finalEndDate = endDate || startDate;
         const finalDeadline = deadline || finalEndDate;
 
         const event = await Event.findById(id);
         if (!event) return res.status(404).json({ message: 'Event not found' });
-        
+
         if (event.status !== 'pending_announcement_admin') {
             return res.status(400).json({ message: 'Event is not in the correct state' });
         }
@@ -375,7 +406,7 @@ exports.allotEventTiming = async (req, res) => {
         event.deadline = finalDeadline;
         event.status = 'pending_admin';
         if (adminNotes) event.adminNotes = adminNotes;
-        
+
         await event.save();
         res.status(200).json({ message: 'Timing allotted and passed to main admin', event });
     } catch (err) {
@@ -398,10 +429,10 @@ exports.verifyEventTiming = async (req, res) => {
     try {
         const { id } = req.params;
         const { adminNotes } = req.body;
-        
+
         const event = await Event.findById(id);
         if (!event) return res.status(404).json({ message: 'Event not found' });
-        
+
         if (event.status !== 'pending_admin') {
             return res.status(400).json({ message: 'Event is not in the correct state' });
         }
