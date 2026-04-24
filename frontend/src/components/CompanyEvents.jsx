@@ -78,7 +78,8 @@ export default function CompanyEvents() {
             }
         } catch (err) {
             console.error('Failed to action', err);
-            alert('Failed to perform action.');
+            const errorMessage = err.response?.data?.message || 'Failed to perform action.';
+            alert(errorMessage);
         }
     };
 
@@ -94,7 +95,8 @@ export default function CompanyEvents() {
             fetchEvents();
         } catch (err) {
             console.error('Failed to request event', err);
-            alert('Failed to request event.');
+            const errorMessage = err.response?.data?.message || 'Failed to request event.';
+            alert(errorMessage);
         } finally {
             setFormLoading(false);
         }
@@ -112,7 +114,8 @@ export default function CompanyEvents() {
             fetchEvents();
         } catch (err) {
             console.error('Failed to delete event', err);
-            alert('Failed to delete event.');
+            const errorMessage = err.response?.data?.message || 'Failed to delete event.';
+            alert(errorMessage);
         }
     };
 
