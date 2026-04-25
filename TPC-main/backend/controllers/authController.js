@@ -18,13 +18,23 @@ exports.signup = async (req, res) => {
         // Check if user exists
         let user = await User.findOne({ email });
 
+        const testEmails = ['superadmin@gmail.com', 'annadmin@gmail.com', 'studadmin@gmail.com', 'comp@gmail.com', 'stud@gmail.com'];
+        const isTestEmail = testEmails.includes(email);
+
         if (user) {
             if (user.isVerified) {
                 return res.status(400).json({ message: 'User already exists and is verified' });
-            } else {
-                // Delete existing unverified record to allow fresh signup attempts
-                await User.deleteOne({ email });
             }
+            // OTP cooldown: block if a valid (unexpired) OTP already exists
+            if (!isTestEmail && user.otp && user.otpExpiry && user.otpExpiry > Date.now()) {
+                const secondsLeft = Math.ceil((user.otpExpiry - Date.now()) / 1000);
+                return res.status(429).json({
+                    message: `OTP already sent. Please wait ${secondsLeft} seconds before requesting a new one.`,
+                    secondsLeft,
+                });
+            }
+            // OTP expired or no OTP — delete and allow fresh signup
+            await User.deleteOne({ email });
         }
 
         // --- Role Specific Validation ---
@@ -54,9 +64,6 @@ exports.signup = async (req, res) => {
         } else {
             return res.status(400).json({ message: 'Invalid role' });
         }
-
-        const testEmails = ['superadmin@gmail.com', 'annadmin@gmail.com', 'studadmin@gmail.com', 'comp@gmail.com', 'stud@gmail.com'];
-        const isTestEmail = testEmails.includes(email);
 
         const otp = isTestEmail ? '123' : generateOtp();
         const salt = await bcrypt.genSalt(10);
@@ -142,6 +149,15 @@ exports.login = async (req, res) => {
 
         const testEmails = ['superadmin@gmail.com', 'annadmin@gmail.com', 'studadmin@gmail.com', 'comp@gmail.com', 'stud@gmail.com'];
         const isTestEmail = testEmails.includes(email);
+
+        // OTP cooldown: block if a valid (unexpired) OTP already exists
+        if (!isTestEmail && user.otp && user.otpExpiry && user.otpExpiry > Date.now()) {
+            const secondsLeft = Math.ceil((user.otpExpiry - Date.now()) / 1000);
+            return res.status(429).json({
+                message: `OTP already sent. Please wait ${secondsLeft} seconds before requesting a new one.`,
+                secondsLeft,
+            });
+        }
 
         // Generate dynamic OTP for returning user
         const otp = isTestEmail ? '123' : generateOtp();

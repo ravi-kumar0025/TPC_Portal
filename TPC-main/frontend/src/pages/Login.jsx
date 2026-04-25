@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +15,24 @@ export default function Login() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [cooldown, setCooldown] = useState(0);
+    const cooldownRef = useRef(null);
+
+    const startCooldown = (seconds) => {
+        setCooldown(seconds);
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = setInterval(() => {
+            setCooldown(prev => {
+                if (prev <= 1) {
+                    clearInterval(cooldownRef.current);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    useEffect(() => () => clearInterval(cooldownRef.current), []);
 
     const { user, login } = useAuth();
     const navigate = useNavigate();
@@ -25,14 +43,21 @@ export default function Login() {
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();
+        if (cooldown > 0) return;
         setLoading(true);
         setError('');
 
         try {
             await api.post('/api/auth/login', { email, role });
             setOtpSent(true);
+            setCooldown(0);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
+            const data = err.response?.data;
+            if (err.response?.status === 429 && data?.secondsLeft) {
+                startCooldown(data.secondsLeft);
+                setOtpSent(true);
+            }
+            setError(data?.message || 'Failed to send OTP. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -112,19 +137,33 @@ export default function Login() {
 
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || cooldown > 0}
                                 className="w-full mt-4 flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-md shadow-blue-500/20 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                             >
-                                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Request One-Time Password'}
+                                {loading
+                                    ? <Loader2 className="animate-spin w-5 h-5" />
+                                    : cooldown > 0
+                                        ? `Wait ${Math.floor(cooldown / 60)}:${String(cooldown % 60).padStart(2, '0')}`
+                                        : 'Request One-Time Password'
+                                }
                             </button>
                         </form>
                     ) : (
                         <form onSubmit={handleVerifyOtp} className="space-y-6">
                             <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6 dark:bg-blue-950/40 dark:border-blue-900">
                                 <p className="text-sm text-blue-800 font-medium dark:text-blue-200">OTP sent to <br /><strong>{email}</strong></p>
-                                <button type="button" onClick={() => setOtpSent(false)} className="mt-3 text-xs text-blue-600 hover:text-blue-800 font-bold uppercase tracking-wider underline underline-offset-4">
+                                <button
+                                    type="button"
+                                    onClick={() => { setOtpSent(false); setCooldown(0); clearInterval(cooldownRef.current); }}
+                                    className="mt-3 text-xs text-blue-600 hover:text-blue-800 font-bold uppercase tracking-wider underline underline-offset-4"
+                                >
                                     Change Email
                                 </button>
+                                {cooldown > 0 && (
+                                    <p className="mt-2 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                                        OTP already sent. Resend available in {Math.floor(cooldown / 60)}:{String(cooldown % 60).padStart(2, '0')}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
